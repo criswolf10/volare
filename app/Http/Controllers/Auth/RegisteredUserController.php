@@ -56,12 +56,9 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Asignar rol basado en si es el primer usuario
-        if (User::count() === 1) {
-            $user->assignRole('admin');
-        } else {
+        // Asignar rol cliente a los usuarios registrados
+
             $user->assignRole('client');
-        }
 
         // Asignar la URL de la imagen predeterminada
         $defaultImageUrl = 'img/avatar.png';
@@ -73,10 +70,7 @@ class RegisteredUserController extends Controller
         // Disparar el evento de registro
         event(new Registered($user));
 
-        // Iniciar sesión al usuario
-        Auth::login($user);
-
         // Redirigir al usuario al dashboard después de completar el registro
-        return redirect()->route('dashboard')->with('status', 'Registro exitoso');
+        return redirect()->route('home')->with('status', 'Registro exitoso');
     }
 }

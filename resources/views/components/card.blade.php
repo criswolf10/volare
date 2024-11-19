@@ -12,7 +12,7 @@
         </div>
 
         <!-- Descripción y Botón -->
-        <div class="flex flex-col justify-center items-center w-full  bg-white ">
+        <div class="flex flex-col justify-center items-center w-full bg-white ">
             <p class="text-gray-600 text-center">{{ $slot }}</p>
             <x-tertiary-button class="mt-12 w-full">
                 <a href="{{ auth()->check() ? route('flights') : route('login') }}">

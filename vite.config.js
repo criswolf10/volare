@@ -14,7 +14,7 @@ export default defineConfig({
     server: {
         host: true,  // Permitir conexiones desde la red local
         hmr: {
-            host: '192.168.100.28',// Cambia esto a tu IP local si es necesario
+            host: '192.168.18.6',// Cambia esto a tu IP local si es necesario
         },
     },
 });

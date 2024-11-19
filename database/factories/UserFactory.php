@@ -28,8 +28,8 @@ class UserFactory extends Factory
         $defaultImagePath = public_path('icons/avatar.png');
 
         return [
-            'name' => fake()->name(),
-            'lastname'=> fake()->lastname(),
+            'name' => 'Jesús',
+            'lastname'=> 'Delgado',
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
