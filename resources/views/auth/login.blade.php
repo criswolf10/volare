@@ -1,23 +1,26 @@
 <x-guest-layout>
+    @section('title', 'Inicio de sesión')
+
     @section('form')
-        <div class="bg-[#0A2827] flex flex-col h-auto p-3 w-full lg:w-[50%] xl:h-full xl:w-[30%] justify-center items-center">
+        <div class="bg-[#0A2827] flex flex-col h-auto p-3 w-full md:h-full lg:w-[50%] xl:h-full xl:w-[30%] justify-center items-center">
             <div class="flex w-full min-h-[40%] sm:w-[75%] lg:w-[90%]">
                 <!-- Session Status -->
                 <form method="POST" action="{{ route('login') }} " class="w-full p-3 flex flex-col justify-center items-center">
                     @csrf
-                    <h2 class="text-white text-2xl xl:text-4xl mb-4">Inicio de sesión</h2>
+                    <h2 class="text-white text-2xl font-bold xl:text-4xl mb-8">Inicio de sesión</h2>
 
                     <!-- Email Address -->
                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     <div class="flex justify-center items-center w-full mb-1 xl:mb-4">
                         <x-input-label for="email" />
-                        <x-text-input id="email" class=" mt-1 justify-center" type="email" name="email"
-                            required autofocus autocomplete="username" placeholder="Email" />
+                        <x-text-input id="email" class=" mt-1 justify-center" type="email" name="email" value="{{ old('email') }}"
+                            required autofocus autocomplete="email" placeholder="Email" />
                     </div>
                     <!-- Password -->
                     <x-input-error :messages="$errors->get('password')" class="mt-2 text-center" />
-                    <x-input-label for="password" />
+
                     <div class="relative w-full mb-3">
+                        <x-input-label for="password" />
                         <x-text-input id="password" class="w-full" type="password" name="password" required
                             autocomplete="current-password" placeholder="Contraseña" />
                         <span class="absolute right-2.5 top-[25%] translate-y-[50%]  cursor-pointer"
@@ -31,7 +34,7 @@
                     <div class="flex w-full justify-around ">
                         <div class="flex w-[50%] justify-start items-center">
                             @if (Route::has('password.request'))
-                                <a class=" text-sm xl:ml-4 text-white hover:text-white/80  cursor-pointer"
+                                <a class=" text-xs xl:ml-4 text-white hover:text-white/80  cursor-pointer underline"
                                     href="{{ route('register') }}">
                                     {{ __('¿Aún no estas registrado?') }}
                                 </a>
@@ -39,7 +42,7 @@
                         </div>
                         <div class="flex w-[50%] h-full justify-end items-center">
                             @if (Route::has('password.request'))
-                                <a class=" text-sm xl:mr-4 text-white hover:text-white/80 cursor-pointer"
+                                <a class=" text-xs xl:mr-4 text-white hover:text-white/80 cursor-pointer underline"
                                     href="{{ route('password.request') }}">
                                     {{ __('Olvidé mi contraseña') }}
                                 </a>

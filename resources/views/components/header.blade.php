@@ -13,9 +13,9 @@
             <img src="{{ asset('icons/search.png') }}" alt="Icono lupa" class="w-5 h-5 md:w-7 md:h-7 ">
         </div>
         <div class="flex justify-center items-center mr-2">
-            <img src="{{ auth()->user()->getFirstMediaUrl('profile_photos') ?? asset('img/avatar.png') }}"
+            <img src="{{ auth()->user()->getFirstMediaUrl('profile_photos') ?: asset('img/avatar.png') }}"
                 alt="Foto de perfil" class="w-10 h-10 rounded-full object-cover mr-2 md:w-12 md:h-12 ">
-            <div class="text-white text-sm uppercase md:text-lg ">{{ Auth::user()->name }}</div>
+            <div class="text-white text-sm font-semibold uppercase md:text-lg">{{ Auth::user()->name }}</div>
             <div  class="flex justify-center items-center">
                 <!-- Icono como enlace de dropdown -->
                 <x-dropdown align="right" width="48">
@@ -46,15 +46,15 @@
         <div class="flex justify-end items-center">
             <div class="flex justify-end items-center">
                 <a href="{{ route('register') }}"
-                    class="text-white text-sm mr-3 md:text-lg lg:text-lg ring-1 ring-transparent transition hover:text-white/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white">
-                    Registrarse
+                    class="text-white text-sm mr-3 md:text-lg lg:text-lg ring-1 ring-transparent transition hover:text-white/70 focus:outline-none focus-visible:ring-[#FF2D20]">
+                    Regístrate
                 </a>
             </div>
             @if (Route::has('login'))
-                <div class="flex items-center justify-center mr-3 mb-3 ">
-                    <x-primary-button onclick="window.location.href='{{ route('login') }}'">
+                <div class="flex items-center justify-center mr-3 mb-3">
+                    <x-tertiary-button onclick="window.location.href='{{ route('login') }}'">
                         Iniciar sesión
-                    </x-primary-button>
+                    </x-tertiary-button>
                 </div>
         </div>
         @endif

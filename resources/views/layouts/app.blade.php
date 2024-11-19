@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+
     <title>@yield('title')</title>
 
     <!-- Scripts -->
@@ -13,7 +14,7 @@
 </head>
 
 <body class="min-h-screen antialiased m-0 p-0 bg-[#E4F2F2]">
-    <div class="flex flex-col w-full h-screen bg-[#E4F2F2] ">
+    <div class="flex flex-col w-full h-screen ">
         <!-- Seccion del header -->
         <div id="header" class="flex fixed h-16 w-full md:h-20 lg:h-24 z-20">
             <!-- boton menu hamburguesa -->
@@ -34,9 +35,9 @@
             </nav>
 
             <!-- sección del main -->
-            <main id="content" class="p-5 md:p-5 flex justify-center items-center w-full">
-                <div class="flex flex-col justify-center items-center bg-white rounded-lg mt-16 md:mt-20 lg:mt-24 xl:mt-32">
-                    <h2 class="mt-5 text-lg font-bold mb-4 uppercase">
+            <main id="content" class="p-5 md:p-5 flex h-auto justify-center items-center w-full xl:w-[93%] 3xl:w-[95%] xl:ml-[7%] 2xl:ml-[6%] 3xl:ml-[5%]">
+                <div class="flex flex-col w-full min-h-screen bg-white rounded-lg mt-16 md:mt-20 lg:mt-24">
+                    <h2 class=" flex mt-5 text-xl xl:text-3xl ml-4 xl:ml-6 font-bold mb-4 uppercase">
                         @yield('title-page')
                     </h2>
                     @yield('content')
@@ -45,29 +46,4 @@
         </div>
     </div>
 </body>
-<script>
-    // Variables para el menú
-    const menuToggle = document.getElementById("menu-toggle");
-    const sidebar = document.getElementById("sidebar");
-    const content = document.getElementById("content");
-
-    // Evento para mostrar u ocultar el sidebar
-    menuToggle.addEventListener("click", () => {
-        // Mostrar u ocultar el sidebar
-        sidebar.classList.toggle("hidden");
-
-        // Detectar si estamos en tamaño `tl` o `xl`
-        if (window.innerWidth <= '1279') {
-            // Para mobile y tablet portrait, aplicar cambios verticales
-            sidebar.classList.toggle("translate-y-full"); // Sidebar entra desde arriba
-            content.classList.toggle("mt-16"); // Añade padding top para mobile
-            content.classList.toggle("md:mt-20");
-            content.classList.toggle("lg:mt-24");
-
-
-        }
-    });
-</script>
-
-
 </html>

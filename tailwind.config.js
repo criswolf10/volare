@@ -6,14 +6,15 @@ export default {
     content: [
         "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",
         "./storage/framework/views/*.php",
+        "./resources/**/*.js",
         "./resources/views/**/*.blade.php",
     ],
 
     theme: {
         extend: {
             fontFamily: {
-                sans: ["Figtree", ...defaultTheme.fontFamily.sans],
-                title: ["Marvel", "sans-serif"], // Agregar 'title' con la fuente 'Marvel'
+                title: ['"Zilla Slab"', ...defaultTheme.fontFamily.serif], // Fuente personalizada para títulos
+                body: ['"Open Sans"', "sans-serif"], // Fuente para el resto del texto
             },
             screens: {
                 "3xl": "1920px",
@@ -21,5 +22,5 @@ export default {
         },
     },
 
-    plugins: [forms],
+    plugins: [forms, require("@tailwindcss/typography")],
 };

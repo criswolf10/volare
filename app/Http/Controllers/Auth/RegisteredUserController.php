@@ -30,41 +30,53 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'lastname' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:3', 'max:255'],
+            'lastname' => ['required', 'string', 'min:3', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'phone' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'phone' => ['required', 'digits:9', 'unique:users,phone'],
+            'password' => [
+                'required',
+                'confirmed',
+                Rules\Password::min(8)
+                    ->mixedCase()
+                    ->letters()
+                    ->numbers()
+                    ->symbols(),
+            ],
         ]);
+
+         // Formatear el teléfono
+    $formattedPhone = preg_replace('/(\d{3})(\d{2})(\d{2})(\d{2})/', '$1 $2 $3 $4', $request->phone);
 
         $user = User::create([
             'name' => $request->name,
             'lastname' => $request->lastname,
             'email' => $request->email,
+            'phone' => $formattedPhone,
             'password' => Hash::make($request->password),
         ]);
 
         // Asignar rol basado en si es el primer usuario
-        if (User::count() === 1) { // Si este es el primer usuario
-            $user->assignRole('admin'); // Asigna el rol admin
+        if (User::count() === 1) {
+            $user->assignRole('admin');
         } else {
-            $user->assignRole('client'); // Asigna el rol client a los demás
+            $user->assignRole('client');
         }
 
-
         // Asignar la URL de la imagen predeterminada
-        $defaultImageUrl = 'icons/avatar.png'; // Solo la ruta relativa
+        $defaultImageUrl = 'img/avatar.png';
         $user->addMedia(public_path($defaultImageUrl))
             ->preservingOriginal()
             ->usingFileName('avatar.png')
             ->toMediaCollection('profile_photos');
 
-
-
+        // Disparar el evento de registro
         event(new Registered($user));
 
+        // Iniciar sesión al usuario
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        // Redirigir al usuario al dashboard después de completar el registro
+        return redirect()->route('dashboard')->with('status', 'Registro exitoso');
     }
 }

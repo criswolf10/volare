@@ -1,9 +1,10 @@
 <x-app-layout>
     @section('title', 'Volare | Inicio')
 
-        @section('title-page','¿Cuál será tu próximo destino?')
+    @section('title-page', '¿Cuál será tu próximo destino?')
+
     @section('content')
-        <div class="">
+        <div class="flex flex-col min-h-screen justify-around p-7 gap-6 lg:flex-row xl:mt-4">
             <!-- Carta 1 -->
             <x-card title="Tailandia" image="img/tailandia.jpg">
                 Explora el encanto de este destino con paisajes impresionantes y cultura vibrante.
@@ -18,6 +19,7 @@
             <x-card title="Estambul" image="img/estambul.jpg">
                 Descubre los sabores y tradiciones de este destino único en el mundo.
             </x-card>
+
         </div>
     @endsection
 </x-app-layout>

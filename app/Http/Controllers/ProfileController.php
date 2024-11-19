@@ -9,8 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
+
 
 
 class ProfileController extends Controller
@@ -42,6 +41,13 @@ class ProfileController extends Controller
         return redirect()->back()->with('status', 'Foto de perfil actualizada');
     }
 
+    public function deletePhoto(User $user)
+    {
+        // Eliminar la foto de perfil
+        $user->clearMediaCollection('profile_photos');
+
+        return redirect()->back()->with('status', 'Foto de perfil eliminada');
+    }
 
     /**
      * Update the user's profile information.
@@ -79,4 +85,7 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+
+
 }

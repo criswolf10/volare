@@ -12,7 +12,7 @@
         <div class="flex justify-center items-venter w-full mb-3">
             <x-input-label for="email" />
             <x-text-input id="email" class=" mt-1 w-3/4 justify-center" type="email" name="email" required autofocus
-                autocomplete="username" placeholder="Email" />
+                autocomplete="email" placeholder="Email" />
         </div>
 
         <!-- Password -->

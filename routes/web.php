@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\FlightController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,6 +20,7 @@ Route::get('/flights', function () {
     return view('flights');
 })->name('flights');
 
+
 Route::get('/sales', function () {
     return view('sales');
 })->middleware(['auth', 'verified'])->name('sales');
@@ -31,9 +33,11 @@ Route::get('/users', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/update-profile/{user}', [ProfileController::class, 'updatePhoto'])->name('profile.update-photo');
+    Route::put('/profile/{user}', [ProfileController::class, 'updatePhoto'])->name('profile.update-photo');
+    Route::delete('/profile/{user}', [ProfileController::class, 'deletePhoto'])->name('profile.delete-photo');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 
 require __DIR__.'/auth.php';

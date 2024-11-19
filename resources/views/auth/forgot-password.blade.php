@@ -7,7 +7,7 @@
                 <form method="POST" action="{{ route('password.email') }}"
                     class="w-full flex flex-col justify-center items-center">
                     @csrf
-                    <h2 class="text-white text-2xl xl:text-4xl mb-4 ">¿Olvidaste tu contraseña? </h2>
+                    <h2 class="text-white text-center text-2xl xl:text-3xl mb-4 ">¿Olvidaste tu contraseña? </h2>
                     <div class="flex w-[75%] text-1xl text-white mb-4 text-center">
                         {{ __('No te preocupes. Ingresa tu dirección de correo electrónico y te enviaremos un enlace para restablecerla.') }}
                     </div>
@@ -22,7 +22,7 @@
                         {{ __('Recuperar Contraseña') }}
                     </x-primary-button>
                     <div class="flex items-center justify-end mt-3 w-full">
-                        <a class="text-sm xl:mr-4 text-white hover:text-white/80  cursor-pointer" href="{{ route('login') }}">
+                        <a class="text-sm xl:mr-4 text-white hover:text-white/80  cursor-pointer underline" href="{{ route('login') }}">
                             {{ __('¿La has recordado? Vuelve a iniciar sesion') }}
                         </a>
                     </div>
