@@ -12,5 +12,7 @@ class TicketController extends Controller
         $sales = Ticket::with(['user', 'flight'])->get();
         return view('sales', compact('sales'));
     }
+
+    
 }
 

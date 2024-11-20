@@ -11,6 +11,7 @@
 <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
 
 
+
     <title>@yield('title')</title>
 
     <!-- Scripts -->

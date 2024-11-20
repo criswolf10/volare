@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use NumberFormatter;
 
 class Flight extends Model
 {
@@ -18,5 +19,12 @@ class Flight extends Model
     {
         return $this->hasMany(Ticket::class);
     }
+
+    public function getFormattedPriceAttribute()
+    {
+        $formatter = new NumberFormatter('es_ES', NumberFormatter::CURRENCY);
+        return $formatter->formatCurrency($this->price, 'EUR');
+    }
+
 }
 

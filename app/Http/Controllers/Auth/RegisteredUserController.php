@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
@@ -45,8 +44,8 @@ class RegisteredUserController extends Controller
             ],
         ]);
 
-         // Formatear el teléfono
-    $formattedPhone = preg_replace('/(\d{3})(\d{2})(\d{2})(\d{2})/', '$1 $2 $3 $4', $request->phone);
+        // Formatear el teléfono
+        $formattedPhone = preg_replace('/(\d{3})(\d{2})(\d{2})(\d{2})/', '$1 $2 $3 $4', $request->phone);
 
         $user = User::create([
             'name' => $request->name,
@@ -56,9 +55,12 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Asignar rol cliente a los usuarios registrados
-
+        // Asignar rol basado en si es el primer usuario
+        if (User::count() === 1) {
+            $user->assignRole('admin');
+        } else {
             $user->assignRole('client');
+        }
 
         // Asignar la URL de la imagen predeterminada
         $defaultImageUrl = 'img/avatar.png';
@@ -69,6 +71,8 @@ class RegisteredUserController extends Controller
 
         // Disparar el evento de registro
         event(new Registered($user));
+
+
 
         // Redirigir al usuario al dashboard después de completar el registro
         return redirect()->route('home')->with('status', 'Registro exitoso');

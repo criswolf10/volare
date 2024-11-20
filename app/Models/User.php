@@ -9,6 +9,8 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 
 
@@ -32,6 +34,7 @@ class User extends Authenticatable implements HasMedia
         'created_at',
     ];
 
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -54,6 +57,7 @@ class User extends Authenticatable implements HasMedia
             'password' => 'hashed',
         ];
     }
+
 
     public function registerMediaCollections(): void
     {

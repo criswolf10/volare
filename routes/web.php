@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserDataController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FlightController;
 use App\Http\Controllers\TicketController;
@@ -31,10 +31,10 @@ Route::get('/sales', function () {
     return view('sales');
 })->middleware(['auth', 'verified'])->name('sales');
 
-Route::get('/users', [UserDataController::class, 'index']
+Route::get('/users', [UserController::class, 'index']
 )->middleware(['auth', 'verified'])->name('users');
 
-Route::get('/users/data', [UserDataController::class, 'getUserData']
+Route::get('/users/data', [UserController::class, 'getUserData']
 )->middleware(['auth', 'verified'])->name('users.getUserData');
 
 Route::middleware('auth')->group(function () {

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
+use App\Models\User;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,10 +12,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Crear 10 usuarios con datos variados
-        User::factory(45)->create();
+        // Llamar al UserSeeder para gestionar la creación de usuarios y asignación de roles
+        $this->call([
+            UserSeeder::class,
+        ]);
 
-        // Llamar a los seeders de vuelos y ventas
+        // Llamar a los seeders de vuelos, ventas y tickets
         $this->call([
             FlightSeeder::class,
             TicketSeeder::class,

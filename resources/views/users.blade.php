@@ -13,6 +13,7 @@
                         <th>Fecha Registro</th>
                         <th>Email</th>
                         <th>Teléfono</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,10 +31,10 @@
                         serverSide: true,
                         orderable: false,
                         ajax: '{{ route('users.getUserData') }}',
-                        
+
                         columns: [{
-                                data: 'name', 'lastname',
-                                name: 'name', 'lastname',
+                                data: 'full_name',
+                                name: 'full_name',
                                 orderable: false
                             },
                             {
@@ -47,18 +48,18 @@
                                 orderable: false
                             },
                             {
-                                data: 'destination',
-                                name: 'destination',
+                                data: 'email',
+                                name: 'email',
                                 orderable: false
                             },
                             {
-                                data: 'duration',
-                                name: 'duration',
+                                data: 'phone',
+                                name: 'phone',
                                 orderable: false
                             },
                             {
-                                data: 'price',
-                                name: 'price',
+                                data: 'action',
+                                name: 'action',
                                 orderable: false
                             }
                         ],

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('destination');
             $table->string('duration');
             $table->decimal('price', 10, 2);
-            $table->string('seats' );
+            $table->enum('seats', ['1º Clase', '2º Clase', 'Turista']);
             $table->date('date');
             $table->enum('status', ['borrador', 'en espera', 'completo', 'en trayecto']);
             $table->timestamps();

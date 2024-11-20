@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Http\Controllers\UserController;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -25,15 +26,18 @@ class UserFactory extends Factory
     {
 
         // Ruta a tu imagen predeterminada
-        $defaultImagePath = public_path('icons/avatar.png');
+        $defaultImagePath = public_path('img/avatar.png');
+
+        // Formatear el teléfono
+        $formattedPhone = preg_replace('/(\d{3})(\d{2})(\d{2})(\d{2})/', '$1 $2 $3 $4', fake()->phoneNumber());
 
         return [
-            'name' => 'Jesús',
-            'lastname'=> 'Delgado',
+            'name' => fake()->name(),
+            'lastname' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'phone' => fake()->phoneNumber(),
+            'phone' => $formattedPhone,
             'remember_token' => Str::random(10),
         ];
     }
@@ -43,7 +47,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }

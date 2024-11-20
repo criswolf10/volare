@@ -1,25 +1,26 @@
 <?php
 
-namespace Database\Factories;
+namespace Database\Seeders;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
+use Illuminate\Database\Seeder;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
-class UserFactory extends Factory
+class UserSeeder extends Seeder
 {
     /**
-     * Define the model's default state.
+     * Run the database seeds.
      */
-    public function definition(): array
+    public function run(): void
     {
-        return [
-            'name' => $this->faker->firstName(),
-            'lastname' => $this->faker->lastName(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'phone' => $this->faker->phoneNumber(),
-            'password' => bcrypt('password'), // Contraseña fija para pruebas
-            'remember_token' => Str::random(10),
-        ];
+        // Asegurarse de que el rol 'client' existe
+        $clientRole = Role::firstOrCreate(['name' => 'client']);
+
+        // Crear otros usuarios y asignarles el rol 'client'
+        User::factory(100)->create()->each(function ($user) use ($clientRole) {
+            if ($user->id !== 1) {
+                $user->assignRole($clientRole);
+            }
+        });
     }
 }
