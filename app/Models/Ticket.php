@@ -9,39 +9,30 @@ class Ticket extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
         'user_id',
-        'flight_id',
+        'flight_code',
+        'price',
         'quantity',
-        'seat_number',
+        'purchase_date',
     ];
 
     /**
-     * Scopes to filter tickets.
-     */
-    public function scopePurchased($query)
-    {
-        return $query->whereNotNull('user_id');
-    }
-
-    /**
-     * Scope to get tickets available for purchase.
-     */
-    public function scopeAvailable($query)
-    {
-        return $query->whereNull('user_id');
-    }
-
-    /**
-     * Relationships
+     * Relación con el modelo `User`.
      */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Relación con el modelo `Flight`.
+     */
     public function flight()
     {
-        return $this->belongsTo(Flight::class);
+        return $this->belongsTo(Flight::class, 'flight_code', 'code');
     }
 }

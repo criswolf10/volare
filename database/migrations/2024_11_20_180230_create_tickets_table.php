@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tickets', function (Blueprint $table) {
+            $table->id(); // ID único como clave primaria
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // Relación con usuarios
+            $table->string('flight_code'); // Relación con vuelos (por código)
+            $table->decimal('price', 10, 2); // Precio con dos decimales
+            $table->unsignedInteger('quantity')->default(1); // Cantidad de tickets comprados
+            $table->date('purchase_date'); // Fecha de compra
+            $table->timestamps();
+
+            // Clave foránea para relacionar con la tabla flights
+            $table->foreign('flight_code')->references('code')->on('flights')->cascadeOnDelete();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tickets');
+    }
+};

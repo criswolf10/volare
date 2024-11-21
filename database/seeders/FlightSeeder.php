@@ -2,15 +2,16 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Flight;
-use Database\Factories\FlightFactory;
+use Illuminate\Database\Seeder;
 
 class FlightSeeder extends Seeder
 {
-    public function run()
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
     {
-        Flight::factory(180)->create();
-    }
+        Flight::factory()->count(50)->create();
 }
-
+}

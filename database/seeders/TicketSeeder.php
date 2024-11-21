@@ -2,31 +2,16 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Ticket;
-use App\Models\Flight;
-use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class TicketSeeder extends Seeder
 {
-    public function run()
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
     {
-
-        $users = User::all();
-        $flights = Flight::all();
-
-        // Crear tickets con usuario asignado
-        foreach ($users as $user) {
-            Ticket::factory()->create([
-                'user_id' => $user->id,
-                'flight_id' => $flights->random()->id,
-            ]);
-        }
-
-        // Crear tickets sin usuario asignado
-        Ticket::factory(100)->create([
-            'user_id' => null, // Billetes no comprados
-            'flight_id' => $flights->random()->id,
-        ]);
+        Ticket::factory()->count(100)->create();
     }
 }

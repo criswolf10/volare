@@ -4,27 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use NumberFormatter;
 
 class Flight extends Model
 {
     use HasFactory;
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'flights';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
-        'code', 'aircraft', 'origin', 'destination', 'duration',
-        'price', 'seats', 'date', 'status'
+        'code',
+        'aircraft',
+        'origin',
+        'destination',
+        'duration',
+        'departure_date',
+        'departure_time',
+        'arrival_time',
+        'seats_class',
+        'status',
     ];
-
-    public function ticket()
-    {
-        return $this->hasMany(Ticket::class);
-    }
-
-    public function getFormattedPriceAttribute()
-    {
-        $formatter = new NumberFormatter('es_ES', NumberFormatter::CURRENCY);
-        return $formatter->formatCurrency($this->price, 'EUR');
-    }
-
 }
-
