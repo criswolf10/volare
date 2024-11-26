@@ -79,7 +79,6 @@
             </div>
             <x-input-error :messages="$errors->get('role')" class="mt-2" />
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
             <div class="flex items-center gap-4 mb-3 xl:w-[50%]">
                 <x-tertiary-button>
                     {{ __('Crear usuario') }}

@@ -28,16 +28,13 @@ class UserFactory extends Factory
         // Ruta a tu imagen predeterminada
         $defaultImagePath = public_path('img/avatar.png');
 
-        // Formatear el teléfono
-        $formattedPhone = preg_replace('/(\d{3})(\d{2})(\d{2})(\d{2})/', '$1 $2 $3 $4', fake()->phoneNumber());
-
         return [
             'name' => fake()->name(),
             'lastname' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'phone' => $formattedPhone,
+            'phone' => fake()->phoneNumber(),
             'remember_token' => Str::random(10),
         ];
     }

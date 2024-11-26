@@ -36,9 +36,10 @@ Route::get('/users', [UserController::class, 'index'])->name('users');
 Route::get('/users/data', [UserController::class, 'getUserData'])->name('users.userDatatable');
 Route::get('/admin/create-users', function () {return view('admin.create-users');})->name('create-users');
 Route::patch('/admin/create-users', [UserController::class, 'userCreate'])->name('user-create');
-Route::get('/admin/edit-users', [UserController::class, 'userEdit'])->name('edit-users');
-Route::patch('/admin/edit-users', [UserController::class, 'userUpdate'])->name('user-update');
-Route::delete('/admin/edit-users', [UserController::class, 'userDelete'])->name('user-delete');
+Route::get('/admin/edit-users/{id}', [UserController::class, 'userEdit'])->name('edit-users');
+Route::patch('/admin/edit-users/{id}', [UserController::class, 'userUpdate'])->name('user-update');
+Route::delete('/admin/edit-users/{id}', [UserController::class, 'userDelete'])->name('user-delete');
+Route::
 
 Route::get('/sales/data', [TicketController::class, 'getMyTickets'])->name('sales.getTickets');
 

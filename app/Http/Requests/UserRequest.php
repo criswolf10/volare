@@ -22,20 +22,45 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->route('id'); // Captura el ID del usuario de la ruta (solo aplica en edición)
+
         return [
             'name'=> ['required', 'string', 'min:3', 'max:40'],
-            'lastname'=>['required','string','min:3','max:70'],
-            'email'=> ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => [
+            'lastname'=> ['required', 'string', 'min:3', 'max:70'],
+            'email'=> [
                 'required',
+                'string',
+                'email',
+                'max:255',
+                "unique:users,email,{$userId}" // Ignorar unicidad para el usuario actual en edición
+            ],
+            'password' => [
+                $this->isMethod('patch') ? 'nullable' : 'required', // Contraseña solo requerida en creación
                 'confirmed',
-                    Password::min(8)
+                Password::min(8)
                     ->mixedCase()
                     ->letters()
                     ->numbers()
                     ->symbols(),
             ],
-            'phone' => ['required', 'digits:9', 'unique:users'],
+            'phone' => [
+                'required',
+                'digits:9',
+                "unique:users,phone,{$userId}" // Ignorar unicidad para el usuario actual en edición
+            ],
         ];
     }
+
+
+    public function messages(): array
+{
+    return [
+        'name.required' => 'The name field is required.',
+        'lastname.required' => 'The lastname field is required.',
+        'email.unique' => 'This email is already in use.',
+        'phone.unique' => 'This phone number is already registered.',
+        'password.confirmed' => 'The passwords do not match.',
+    ];
+}
+
 }

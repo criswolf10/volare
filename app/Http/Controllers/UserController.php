@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -16,9 +19,10 @@ class UserController extends Controller
     }
 
 
-    public function userEdit()
+    public function userEdit($id)
     {
-        return view('admin.edit-users');
+        $user = User::findOrFail($id); // Busca al usuario por ID o lanza un error 404
+        return view('admin.edit-users', compact('user'));
     }
 
     // Crear un nuevo usuario
@@ -45,31 +49,58 @@ class UserController extends Controller
     }
 
     // Actualizar un usuario
-
-    public function userUpdate(UserRequest $userRequest)
+    public function userUpdate(UserRequest $userRequest): RedirectResponse
     {
-        $user = User::find($userRequest->id);
-        $user->name = $userRequest->name;
-        $user->lastname = $userRequest->lastname;
-        $user->email = $userRequest->email;
-        $user->phone = $userRequest->phone;
-        $user->save();
+        // Busca el usuario con el ID proporcionado
+        $user = User::findOrFail($userRequest->route('id'));
+
+        // Actualiza solo los campos válidos
+        $user->fill($userRequest->validated());
+
+        // Limpia el campo 'email_verified_at' si cambia el email
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        // Actualiza la contraseña solo si se envía
+        if ($userRequest->filled('password')) {
+            $user->password = bcrypt($userRequest->password);
+        }
+
+
+        // Asignar el rol al usuario
         $role = $userRequest->input('role');
         if ($role) {
             $user->assignRole($role);
         }
-        return response()->json(['success' => 'User updated successfully']);
+
+        // Guarda los cambios
+        $user->save();
+
+        return redirect()->route('edit-users', $user->id)->with('success', 'User updated successfully');
     }
+
+
 
 
     // Eliminar un usuario
-
-    public function userDelete(UserRequest $userRequest)
+    public function userDelete(Request $Request, $id)
     {
-        $user = User::find($userRequest->id);
+        // Validación para asegurar que el usuario tenga permisos para eliminar
+        $Request->validate([
+            'password' => 'required|password',
+        ]);
+
+        // Buscar al usuario
+        $user = User::findOrFail($id);
+
+        // Eliminar al usuario
         $user->delete();
-        return response()->json(['success' => 'User deleted successfully']);
+
+        // Redirigir a la lista de usuarios con un mensaje de éxito
+        return redirect()->route('users')->with('success', 'Usuario eliminado con éxito.');
     }
+
 
 
 
@@ -113,13 +144,12 @@ class UserController extends Controller
                             </a>';
 
                     // Opción de eliminar con un formulario, protegiendo la acción DELETE
-                    $deleteButton = '<form action="' . route('user-delete', ['id' => $user->id]) . '" method="POST" class="inline">
-                                    ' . csrf_field() . '
-                                    ' . method_field('DELETE') . '
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'¿Estás seguro de que deseas eliminar este usuario?\')">
-                                        <img src="' . asset('icons/delete.png') . '" alt="delete">
-                                    </button>
-                                </form>';
+                    $deleteButton = '<button type="button" class="btn btn-sm user-delete-btn"
+                    x-data="{}"
+                    x-on:click.prevent="$dispatch(\'open-modal\', \'confirm-user-deletion\')"
+                    data-user-id="' . $user->id . '">
+                    <img src="' . asset('icons/delete.png') . '" alt="delete">
+                </button>';
 
                     // Envolver los botones en un contenedor con clases de Tailwind para alinear en fila
                     return '<div id="action-btn" class="flex gap-3">' . $editButton . $showButton . $deleteButton . '</div>';
