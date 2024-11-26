@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         $clientRole = Role::firstOrCreate(['name' => 'client']);
 
         // Crear otros usuarios y asignarles el rol 'client'
-        User::factory(100)->create()->each(function ($user) use ($clientRole) {
+        User::factory(10)->create()->each(function ($user) use ($clientRole) {
             if ($user->id !== 1) {
                 $user->assignRole($clientRole);
             }

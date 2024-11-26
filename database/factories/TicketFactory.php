@@ -16,12 +16,16 @@ class TicketFactory extends Factory
      */
     public function definition(): array
     {
+        $flight = Flight::factory()->create();
+        $class = $this->faker->randomElement(['first_class', 'second_class', 'tourist']);
+        $seat = $flight->assignSeat($class);
+
         return [
             'user_id' => User::factory(),
-            'flight_code' => Flight::factory()->create()->code,
+            'flight_code' => $flight->code,
             'price' => $this->faker->randomFloat(2, 50, 500),
-            'quantity' => $this->faker->numberBetween(1, 180),
             'purchase_date' => $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
+            
         ];
     }
 }

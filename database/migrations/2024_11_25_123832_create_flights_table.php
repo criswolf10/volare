@@ -20,8 +20,10 @@ return new class extends Migration
             $table->date('departure_date');
             $table->time('departure_time');
             $table->time('arrival_time');
-            $table->enum('seats_class', ['1ª clase','2ª clase', 'turista']);
-            $table->enum('status', ['cancelado','en espera','en trayecto', 'completo']);
+            $table->Integer('seats_quantity');
+            $table->enum('seats_class', ['1º clase','2º clase', 'turista']);
+            $table->string('seats_code');
+            $table->enum('status', ['borrador','en espera','en trayecto', 'completo', 'cancelado']);
             $table->timestamps();
         });
     }

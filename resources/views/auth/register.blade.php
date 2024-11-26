@@ -61,7 +61,7 @@
                         <x-input-label for="password_confirmation" />
                         <x-text-input id="password_confirmation" class=" mt-1 justify-center" type="password"
                             name="password_confirmation" required autocomplete="new-password"
-                            placeholder="Corfima tu contraseña" />
+                            placeholder="Confima tu contraseña" />
                     </div>
                     <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
 

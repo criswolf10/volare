@@ -9,7 +9,7 @@
         "laravel-lang/common": "^6.4",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
-        "spatie/laravel-medialibrary": "^11.9",
+        "spatie/laravel-medialibrary": "^11.10",
         "spatie/laravel-permission": "^6.9",
         "yajra/laravel-datatables": "11.0",
         "yajra/laravel-datatables-oracle": "^11.1"

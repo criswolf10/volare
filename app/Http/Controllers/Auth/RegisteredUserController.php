@@ -44,14 +44,12 @@ class RegisteredUserController extends Controller
             ],
         ]);
 
-        // Formatear el teléfono
-        $formattedPhone = preg_replace('/(\d{3})(\d{2})(\d{2})(\d{2})/', '$1 $2 $3 $4', $request->phone);
 
         $user = User::create([
             'name' => $request->name,
             'lastname' => $request->lastname,
             'email' => $request->email,
-            'phone' => $formattedPhone,
+            'phone' => $request->phone,
             'password' => Hash::make($request->password),
         ]);
 

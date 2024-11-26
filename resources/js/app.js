@@ -6,6 +6,9 @@ window.Alpine = Alpine;
 
 Alpine.start();
 
+
+
+
 // Variables para el menú
 const menuToggle = document.getElementById("menu-toggle");
 const sidebar = document.getElementById("sidebar");
@@ -27,3 +30,9 @@ menuToggle.addEventListener("click", () => {
 
     }
 });
+
+
+
+
+
+

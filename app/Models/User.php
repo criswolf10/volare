@@ -18,7 +18,7 @@ use Spatie\Permission\Models\Permission;
 class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, InteractsWithMedia ;
+    use HasFactory, Notifiable, HasRoles, InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -62,5 +62,13 @@ class User extends Authenticatable implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('profile_photos')->useDisk('public')->singleFile(); // Almacena solo una imagen
+    }
+
+    /**
+     * Relación con los tickets.
+     */
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
     }
 }

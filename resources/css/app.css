@@ -19,3 +19,62 @@
         @apply font-body;
     }
 }
+
+
+
+
+
+/* Estilo para el input del buscador de DataTables */
+.dataTables_filter input {
+    background-color: #E4F2F2;
+    height: 40px;
+    border-radius: 7px;
+    /* Espacio para la lupa */
+    background-image: url('/public/icons/search.png'); /* Añade el ícono de la lupa */
+    background-repeat: no-repeat;
+    background-position: 10px center;  /* Posiciona la lupa a la izquierda */
+    background-size: 20px 20px;  /* Tamaño del ícono */
+    font-size: 14px;  /* Ajusta el tamaño del texto */
+    line-height: 30px;  /* Ajusta la alineación vertical del texto */
+    padding-left: 30px;  /* Espacio para la lupa */
+    border: none;
+    border-bottom: 1px solid #333; /* Solo un borde en la parte inferior */
+}
+
+/* Modificar el texto placeholder */
+.dataTables_filter input::placeholder {
+    color: #999; /* Color del texto "Buscar" */
+    font-size: 14px;  /* Ajusta el tamaño del texto */
+    padding-left: 15px;  /* Asegura que el texto no se sobreponga con la lupa */
+}
+
+/* Mantén el padding en el focus sin mover el texto */
+.dataTables_filter input:focus {
+    padding-left: 35px;  /* No cambiar el padding cuando esté en focus */
+}
+
+/* Opcional: cuando se empieza a escribir y el placeholder desaparece */
+.dataTables_filter input:not(:placeholder-shown) {
+    padding-left: 40px;  /* Mantén el espacio para la lupa */
+}
+
+
+td , th {
+    padding: 10px;
+    text-align: center;
+}
+
+#action-btn{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Colores alternados para las filas */
+table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9; /* Color para filas impares */
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #eaeaea; /* Color para filas pares */
+}
