@@ -18,7 +18,7 @@ class TicketFactory extends Factory
 
         return [
             'user_id' => User::factory(), // Relación con un usuario aleatorio
-            'flight_code' => Flight::all()->random()->code, // Relación con un vuelo aleatorio
+            'flight_id' => Flight::all()->random()->id, // Relación con un vuelo aleatorio
             'price' => $price, // Precio con 2 decimales
             'purchase_date' => $this->faker->date(), // Fecha aleatoria de compra
         ];

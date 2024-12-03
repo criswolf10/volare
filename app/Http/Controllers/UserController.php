@@ -197,9 +197,9 @@ class UserController extends Controller
                                     </a>';
 
                     // Botón de ver historial
-                    $showButton = '<a href="' . route('sales.getTickets', ['id' => $user->id]) . '" class="btn btn-sm btn-info mx-2">
-                                        <img src="' . asset('icons/history-tickets.png') . '" alt="view">
-                                    </a>';
+                    // $showButton = '<a href="' . route('tickets.getTickets', ['id' => $user->id]) . '" class="btn btn-sm btn-info mx-2">
+                    //                     <img src="' . asset('icons/history-tickets.png') . '" alt="view">
+                    //                 </a>';
 
                     // Botón de eliminación con Alpine.js
                     $deleteButton = '<button class="btn btn-sm btn-danger"
@@ -211,7 +211,7 @@ class UserController extends Controller
 
 
                     // Envolver los botones en un contenedor con clases de Tailwind para alinear en fila
-                    return '<div id="action-btn" class="flex gap-3">' . $editButton . $showButton . $deleteButton .  '</div>';
+                    return '<div id="action-btn" class="flex gap-3">' . $editButton  . $deleteButton .  '</div>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);

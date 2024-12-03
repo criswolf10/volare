@@ -60,8 +60,12 @@
 
 
 td , th {
+
     text-align: start;
+    font-size: 0.9rem;
+
 }
+
 
 #action-btn{
     display: flex;

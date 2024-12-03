@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Flight extends Model
+class Flight extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     /**
      * The table associated with the model.
@@ -42,7 +44,7 @@ class Flight extends Model
      *
      * @var array
      */
-    protected $fillable = ['code', 'aircraft_id', 'origin', 'destination', 'duration', 'departure_date', 'departure_time', 'arrival_time', 'status'];
+    protected $fillable = ['code', 'origin', 'destination', 'duration', 'departure_date', 'departure_time', 'arrival_time', 'status'];
 
 
 
@@ -58,11 +60,17 @@ class Flight extends Model
      */
     public function tickets()
     {
-        return $this->hasMany(Ticket::class, 'flight_code', 'code');
+        return $this->hasMany(Ticket::class );
     }
 
     public function aircraft()
     {
         return $this->belongsTo(Aircraft::class);
     }
+
+public function registerMediaCollections(): void
+{
+    $this->addMediaCollection('flight_images')->useDisk('public')->singleFile(); // Almacena solo una imagen
+}
+
 }

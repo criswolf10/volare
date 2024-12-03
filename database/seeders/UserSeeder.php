@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
 
         // Crear 60 usuarios aleatorios y asignarles el rol client
         $clientRole = Role::where('name', 'client')->first();
-        User::factory(60)->create()->each(function ($user) use ($clientRole) {
+        User::factory(20)->create()->each(function ($user) use ($clientRole) {
             $user->assignRole($clientRole);
         });
     }

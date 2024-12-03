@@ -3,8 +3,6 @@
     @section('title-page', 'Listado de usuarios')
 
     @section('content')
-
-
         <div class=" p-5 h-full w-full">
             <div class="flex justify-center items-center w-full mb-6 p-3">
 

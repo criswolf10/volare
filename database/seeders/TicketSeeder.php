@@ -37,8 +37,8 @@ class TicketSeeder extends Seeder
                 // Crear el ticket
                 Ticket::create([
                     'user_id' => $user->id,
-                    'flight_code' => $flight->code,
-                    'price' => $price, 
+                    'flight_id' => $flight->id,
+                    'price' => $price,
                     'purchase_date' => Carbon::now()->toDateString(),
                     'quantity' => 1,
                 ]);

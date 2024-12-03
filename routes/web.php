@@ -26,8 +26,11 @@ Route::patch('/admin/create-flights', [UserController::class, 'flightCreate'])->
 
 
 
-// Rutas para el CRUD de tickets
-Route::get('/sales', [TicketController::class, 'index'])->name('sales');
+Route::middleware(['auth'])->group(function () {
+    // Rutas para el CRUD de tickets
+    Route::get('/tickets', [TicketController::class, 'index'])->name('tickets');
+    Route::get('/tickets/data', [TicketController::class, 'getTicketsData'])->name('tickets.ticketDatatable');
+});
 
 Route::middleware(['auth'])->group(function () {
 // Rutas para el CRUD de usuarios
@@ -38,13 +41,7 @@ Route::patch('/admin/create-users', [UserController::class, 'userCreate'])->name
 Route::get('/admin/edit-users/{id}', [UserController::class, 'userEdit'])->name('edit-users');
 Route::patch('/admin/edit-users/{id}', [UserController::class, 'userUpdate'])->name('user-update');
 Route::delete('/admin/edit-users/{id}', [UserController::class, 'destroy'])->name('user-delete');
-
-
-
 });
-
-
-Route::get('/sales/data', [TicketController::class, 'getMyTickets'])->name('sales.getTickets');
 
 
 // Rutas para el perfil del usuario

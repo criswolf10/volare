@@ -3,60 +3,68 @@
     @section('title-page', 'Listado de vuelos')
 
     @section('content')
-    <div class=" p-5 h-full w-full">
-        <div class="flex justify-center items-center w-full mb-6 p-3">
+        <div class=" p-5 h-full w-full">
+            <div class="flex justify-center items-center w-full mb-6 p-3">
 
-            <!-- Contenedor de los botones de filtro y añadir usuario -->
-            <div class="flex justify-start items-center w-[50%] gap-5">
+                <!-- Contenedor de los botones de filtro y añadir usuario -->
+                <div class="flex justify-start items-center w-[50%] gap-5">
 
-                <!-- Botón para abrir el modal de filtro -->
-                <button class="flex items-center justify-center bg-[#22B3B2] w-10 h-10 rounded cursor-pointer"
-                    id="filter-button">
-                    <img src="{{ asset('icons/filter.png') }}" class="w-5 h-5">
-                </button>
+                    <!-- Botón para abrir el modal de filtro -->
+                    <button class="flex items-center justify-center bg-[#22B3B2] w-10 h-10 rounded cursor-pointer"
+                        id="filter-button">
+                        <img src="{{ asset('icons/filter.png') }}" class="w-5 h-5">
+                    </button>
 
-                <!-- Contenedor del buscador -->
-                <div id="custom-search-container"></div>
-            </div>
+                    <!-- Contenedor del buscador -->
+                    <div id="custom-search-container"></div>
+                </div>
 
-            <!-- Botón para añadir un nuevo usuario -->
-            <div class="flex justify-end items-center w-[50%]">
-                <div>
-                    <x-tertiary-button>
-                        <a href="{{ route('create-flights') }}">+ Añadir vuelo</a>
-                    </x-tertiary-button>
+                <!-- Botón para añadir un nuevo usuario -->
+                <div class="flex justify-end items-center w-[50%]">
+                    <div>
+                        <x-tertiary-button>
+                            <a href="{{ route('create-flights') }}">+ Añadir vuelo</a>
+                        </x-tertiary-button>
+                    </div>
                 </div>
             </div>
+
+
+            <div class=" overflow-x-auto w-full p-3">
+                <table class="table table-bordered justify-center items-center" id="flights-table">
+                    <thead class="bg-[#22B3B2] text-white uppercase ">
+                        <tr>
+                            <th></th>
+                            <th>Vuelo</th>
+                            <th>Avión</th>
+                            <th>Origen</th>
+                            <th>Destino</th>
+                            <th>Duración</th>
+                            <th>Precio</th>
+                            <th>Asientos</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+            <!--Agregamos los contenedores para la paginación y mostrar registros -->
+            <div id="custom-page-option" class="flex justify-end items-center w-full h-10 gap-5 my-8">
+                <div id="lengthpage-option"></div>
+                <div id="paginate-option"></div>
+            </div>
         </div>
 
-
-        <div class=" overflow-x-auto w-full p-3">
-            <table class="table table-bordered justify-center items-center" id="flights-table">
-                <thead class="bg-[#22B3B2] text-white uppercase ">
-                    <tr>
-                        <th>Vuelo</th>
-                        <th>Avión</th>
-                        <th>Origen</th>
-                        <th>Destino</th>
-                        <th>Duración</th>
-                        <th>Precio</th>
-                        <th>Asientos</th>
-                        <th>Fecha</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-            </table>
-        </div>
-
+        <x-filter-modal title="Filtrar Vuelos" :fields="[]" />
 
         @push('scripts')
             <script>
                 $(document).ready(function() {
-                    $('#flights-table').DataTable({
+                    var table = $('#flights-table').DataTable({
                         processing: true,
                         serverSide: true,
                         orderable: false,
@@ -71,9 +79,15 @@
                             },
                         },
                         columns: [{
+
+                                data: 'image',
+                                name: 'image',
+                                orderable: false
+                            },
+                            {
                                 data: 'code',
                                 name: 'code',
-
+                                orderable: false
                             },
                             {
                                 data: 'aircraft',
@@ -101,8 +115,8 @@
                                 orderable: false
                             },
                             {
-                                data: 'seats_class',
-                                name: 'seats_class',
+                                data: 'seat_classes',
+                                name: 'seat_classes',
                                 orderable: false
                             },
                             {
@@ -120,7 +134,7 @@
                                 name: 'action',
                                 orderable: false,
                                 searchable: false
-                            }
+                            },
                         ],
                         language: {
                             paginate: {
@@ -135,25 +149,25 @@
                         lengthMenu: [10, 20, 30],
                         initComplete: function() {
                             // Mover el buscador predeterminado al contenedor
-                            $('#users-table_filter').appendTo('#custom-search-container');
+                            $('#flights-table_filter').appendTo('#custom-search-container');
 
                             //Mover mostrar registros al contenedor
-                            $('#users-table_length').appendTo('#lengthpage-option');
+                            $('#flights-table_length').appendTo('#lengthpage-option');
 
                             //Mover paginacion al contenedor
-                            $('#users-table_paginate').appendTo('#paginate-option');
+                            $('#flights-table_paginate').appendTo('#paginate-option');
 
                             // Eliminar el texto predeterminado
-                            $('#users-table_filter label').contents().filter(function() {
+                            $('#flights-table_filter label').contents().filter(function() {
                                 return this.nodeType === 3; // Solo los nodos de texto
                             }).remove();
 
-                            $('#users-table_length label').contents().filter(function() {
+                            $('#flights-table_length label').contents().filter(function() {
                                 return this.nodeType === 3; // Solo los nodos de texto
                             }).remove();
 
                             // Cambiar el placeholder
-                            $('#users-table_filter input').attr('placeholder', 'Buscar:');
+                            $('#flights-table_filter input').attr('placeholder', 'Buscar:');
                         }
                     });
 

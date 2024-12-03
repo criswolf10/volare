@@ -11,7 +11,7 @@
     </div>
 
     <div class="w-full flex justify-centeritems-center xl:ml-6 bg-[#E4F2F2]">
-        <x-nav-link href="{{ route('sales') }}" img-src="icons/sales.png" img-alt="Sales" :active="request()->is('sales')" />
+        <x-nav-link href="{{ route('tickets') }}" img-src="icons/tickets.png" img-alt="tickets" :active="request()->is('tickets')" />
     </div>
 
     <div class="w-full flex justify-centeritems-center xl:ml-6 bg-[#E4F2F2]">

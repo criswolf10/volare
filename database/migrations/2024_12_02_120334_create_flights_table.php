@@ -14,9 +14,8 @@ return new class extends Migration
     {
         Schema::create('flights', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('aircraft_id')->constrained('aircrafts')->cascadeOnDelete(); // Relación con aviones
             $table->string('code')->unique(); // Código único del vuelo
-            $table->unsignedBigInteger('aircraft_id');
-            $table->foreign('aircraft_id')->references('id')->on('aircrafts')->onDelete('cascade');
             $table->string('origin'); // Origen
             $table->string('destination'); // Destino
             $table->time('duration'); // Duración del vuelo

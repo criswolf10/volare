@@ -55,6 +55,7 @@ class UserRequest extends FormRequest
 {
     return [
         'name.required' => 'The name field is required.',
+        'name.min' => 'The name must be at least 3 characters.',    
         'lastname.required' => 'The lastname field is required.',
         'email.unique' => 'This email is already in use.',
         'phone.unique' => 'This phone number is already registered.',

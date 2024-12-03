@@ -14,7 +14,7 @@ class AircraftSeeder extends Seeder
      */
     public function run()
     {
-        // Usando el factory para generar 6 aviones
-        Aircraft::factory()->count(10)->create();
+        // Usando el factory para generar  aviones
+        Aircraft::factory()->count(6)->create();
     }
 }
