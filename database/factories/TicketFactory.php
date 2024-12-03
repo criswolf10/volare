@@ -11,21 +11,17 @@ class TicketFactory extends Factory
 {
     protected $model = Ticket::class;
 
-    /**
-     * Define the model's default state.
-     */
-    public function definition(): array
+    public function definition()
     {
-        $flight = Flight::factory()->create();
-        $class = $this->faker->randomElement(['first_class', 'second_class', 'tourist']);
-        $seat = $flight->assignSeat($class);
+        // Precio aleatorio entre 50 y 500 euros
+        $price = $this->faker->randomFloat(2, 50, 500);
 
         return [
-            'user_id' => User::factory(),
-            'flight_code' => $flight->code,
-            'price' => $this->faker->randomFloat(2, 50, 500),
-            'purchase_date' => $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
-            
+            'user_id' => User::factory(), // Relación con un usuario aleatorio
+            'flight_code' => Flight::all()->random()->code, // Relación con un vuelo aleatorio
+            'price' => $price, // Precio con 2 decimales
+            'purchase_date' => $this->faker->date(), // Fecha aleatoria de compra
         ];
     }
 }
+

@@ -32,7 +32,9 @@
     "Choose Image": "Elegir Imagen",
     "Click here to re-send the verification email.": "Haga clic aquí para reenviar el correo de verificación.",
     "Click to copy": "Haga clic para copiar",
-
+    "If you are sure, enter the password of your administrator account to confirm it.": "Si está seguro, ingrese la contraseña de su cuenta administrador para confirmarlo.",
+    "Are you sure you want to delete this user?": "¿Está seguro que desea eliminar este usuario?",
+    "Are you sure you want to delete this user :user?": "¿Está seguro que desea eliminar este usuario :user?",
     "Client Closed Request": "Solicitud cerrada del cliente",
     "Client": "Cliente",
     "Close": "Cerrar",

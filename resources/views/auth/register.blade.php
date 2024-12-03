@@ -2,6 +2,10 @@
     @section('title', 'Registro')
 
     @section('form')
+    <!-- Verificar si hay un mensaje de éxito en la sesión y mostrar el modal -->
+    @if(session('success'))
+    <x-modal-success show="true" name="success-modal" />
+@endif
         <div
             class="bg-[#0A2827] flex flex-col h-auto p-3 w-full lg:w-[50%] lg:h-full xl:w-[30%] justify-center items-center">
             <div class="flex w-full min-h-[40%] p-5 sm:w-[75%] sm:p-0 lg:w-[90%]">

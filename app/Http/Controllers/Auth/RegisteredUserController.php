@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -26,31 +27,15 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(UserRequest $UserRequest)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'min:3', 'max:255'],
-            'lastname' => ['required', 'string', 'min:3', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'phone' => ['required', 'digits:9', 'unique:users,phone'],
-            'password' => [
-                'required',
-                'confirmed',
-                Rules\Password::min(8)
-                    ->mixedCase()
-                    ->letters()
-                    ->numbers()
-                    ->symbols(),
-            ],
-        ]);
-
 
         $user = User::create([
-            'name' => $request->name,
-            'lastname' => $request->lastname,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
+            'name' => $UserRequest->name,
+            'lastname' => $UserRequest->lastname,
+            'email' => $UserRequest->email,
+            'phone' => $UserRequest->phone,
+            'password' => Hash::make($UserRequest->password),
         ]);
 
         // Asignar rol basado en si es el primer usuario
@@ -72,7 +57,7 @@ class RegisteredUserController extends Controller
 
 
 
-        // Redirigir al usuario al dashboard después de completar el registro
-        return redirect()->route('home')->with('status', 'Registro exitoso');
+        // Redirigir con el modal mostrando el éxito
+        return redirect()->route('home')->with('success', 'Usuario creado con éxito.');
     }
 }

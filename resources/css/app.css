@@ -71,9 +71,36 @@ td , th {
 
 /* Colores alternados para las filas */
 table tbody tr:nth-child(odd) {
-    background-color: #f9f9f9; /* Color para filas impares */
+    background-color: white; /* Color para filas impares */
 }
 
 table tbody tr:nth-child(even) {
-    background-color: #eaeaea; /* Color para filas pares */
+    background-color: #E4F2F2; /* Color para filas pares */
+}
+
+.dataTables_length select {
+    border: 2px solid #d3eaf5; /* Color del borde */
+    border-radius: 25px; /* Más redondeado */
+    cursor: pointer;
+    background-color: #E4F2F2; /* Fondo */
+    font-size: 14px; /* Tamaño de la fuente */
+
+}
+
+.dataTables_paginate .paginate_button  {
+    border-radius: 5px; /* Redondear los botones */
+
+    padding: 5px 10px; /* Espaciado interno */
+    margin: 0 2px; /* Espaciado entre botones */
+    cursor: pointer; /* Cambia el cursor al pasar el mouse */
+}
+
+#users-table_previous , #users-table_next {
+   background-color: #E4F2F2; /* Fondo del botón */
+}
+
+.dataTables_paginate .paginate_button.current {
+    background-color: #22B3B2; /* Fondo del botón activo */
+    color: white; /* Texto blanco */
+    border: 1px solid #22B3B2; /* Borde del botón activo */
 }

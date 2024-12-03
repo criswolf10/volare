@@ -71,4 +71,5 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->hasMany(Ticket::class);
     }
+
 }

@@ -6,16 +6,22 @@
 
 
         <div class=" p-5 h-full w-full">
-            <div class="flex justify-center items-center w-full mb-10 p-3">
+            <div class="flex justify-center items-center w-full mb-6 p-3">
+
+                <!-- Contenedor de los botones de filtro y añadir usuario -->
                 <div class="flex justify-start items-center w-[50%] gap-5">
+
+                    <!-- Botón para abrir el modal de filtro -->
                     <button class="flex items-center justify-center bg-[#22B3B2] w-10 h-10 rounded cursor-pointer"
                         id="filter-button">
                         <img src="{{ asset('icons/filter.png') }}" class="w-5 h-5">
                     </button>
 
+                    <!-- Contenedor del buscador -->
                     <div id="custom-search-container"></div>
                 </div>
 
+                <!-- Botón para añadir un nuevo usuario -->
                 <div class="flex justify-end items-center w-[50%]">
                     <div>
                         <x-tertiary-button>
@@ -24,9 +30,11 @@
                     </div>
                 </div>
             </div>
-            <div class=" overflow-x-auto p-3">
+
+            <!-- Tabla de usuarios -->
+            <div class=" overflow-x-auto w-full p-3">
                 <table class="table table-bordered justify-center items-center" id="users-table">
-                    <thead class="bg-[#22B3B2] text-white uppercase">
+                    <thead class="bg-[#22B3B2] text-white uppercase ">
                         <tr>
                             <th>Usuario</th>
                             <th>Rol</th>
@@ -36,68 +44,85 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-
-                    </tbody>
                 </table>
-                <div id="" class="flex justify-start items-center w-full bg-black h-10">
-                    <div id="page-option" class="bg-white flex w-full"></div>
-                    <div id="" class=""></div>
-                </div>
+            </div>
+
+            <!--Agregamos los contenedores para la paginación y mostrar registros -->
+            <div id="custom-page-option" class="flex justify-end items-center w-full h-10 gap-5 my-8">
+                <div id="lengthpage-option"></div>
+                <div id="paginate-option"></div>
             </div>
         </div>
 
-        <!-- Modal de filtro debajo del botón -->
-        <div id="filter-modal" class="absolute hidden mt-2 bg-white shadow-lg p-6 rounded-lg w-96">
-            <h3 class="text-xl mb-4">Roles</h3>
-            <form id="filter-form">
-                <div>
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" class="role-filter" value="admin"> Administrador
-                    </label>
-                </div>
-                <div>
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" class="role-filter" value="client"> Cliente
-                    </label>
-                </div>
-
-                <div class="mt-4 flex justify-between">
-                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded"
-                        id="cancel-filter">Cancelar</button>
-                    <button type="submit" class="bg-[#22B3B2] text-white py-2 px-4 rounded">Aplicar</button>
-                </div>
-            </form>
-        </div>
+        <!-- Modal de filtro de usuarios -->
+        <x-filter-modal title="Filtrar Usuarios" :fields="[
+            ['type' => 'date', 'name' => 'start_date', 'label' => 'Fecha de inicio'],
+            ['type' => 'date', 'name' => 'end_date', 'label' => 'Fecha de fin'],
+            [
+                'type' => 'checkbox',
+                'name' => 'roles[]',
+                'value' => 'admin',
+                'label' => 'Administrador',
+                'class' => 'role-filter',
+            ],
+            [
+                'type' => 'checkbox',
+                'name' => 'roles[]',
+                'value' => 'client',
+                'label' => 'Cliente',
+                'class' => 'role-filter',
+            ],
+        ]" />
 
 
-        <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
-            <form method="post" action="{{ route('user-delete', ['id' => $user->id]) }}" class="p-6">
-                @csrf
-                @method('delete')
+        <x-modal name="user-deletion" :show="false" focusable>
+            <div x-data="{
+                userId: null,
+                open(id) {
+                    this.userId = id;
+                    this.$dispatch('open-modal', 'user-deletion');
+                },
+                close() {
+                    this.$dispatch('close-modal', 'user-deletion');
+                },
+                submitForm() {
+                    const actionUrl = '/admin/edit-users/' + this.userId;
+                    document.getElementById('delete-form').action = actionUrl;
+                    document.getElementById('delete-form').submit();
+                    this.close(); // Cerrar el modal después de enviar
+                }
+            }" x-on:user-deletion.window="open($event.detail.userId)">
 
-                <h2 class="text-lg font-medium text-gray-900 ">
-                    {{ __('¿Estás seguro que quieres eliminar este usuario?.') }}
-                </h2>
+                <form method="POST" action="" class="p-6" id="delete-form">
+                    @csrf
+                    @method('DELETE')
 
-                <p class="mt-1 text-sm text-gray-600 ">
-                    {{ __('Si estas seguro, introduce la contraseña de tu cuenta administrador para eliminarlo.') }}
-                </p>
+                    <h2 class="text-lg font-medium text-gray-900">
+                        {{ __('Are you sure you want to delete this user?') }}
+                    </h2>
 
-                <div class="mt-6">
-                    <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
-                    <x-text-input id="password" name="password" type="password" class="mt-1 block w-3/4"
-                        placeholder="{{ __('Password') }}" />
-                    <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
-                </div>
+                    <p class="mt-1 text-sm text-gray-600">
+                        {{ __('If you are sure, enter the password of your administrator account to confirm it.') }}
+                    </p>
 
-                <div class="mt-6 flex justify-center">
-                    <x-danger-button>
-                        {{ __('Delete user') }}
-                    </x-danger-button>
-                </div>
-            </form>
+                    {{-- Campo de Contraseña --}}
+                    <div class="mt-6">
+                        <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
+                        <x-text-input id="password" name="password" type="password" class="mt-1 block w-3/4"
+                            placeholder="{{ __('Password') }}" />
+                        <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
+                    </div>
+
+                    {{-- Botón de Confirmar Eliminación --}}
+                    <div class="mt-6 flex justify-center">
+                        <x-danger-button x-on:click.prevent="submitForm()">
+                            {{ __('Delete user') }}
+                        </x-danger-button>
+                    </div>
+                </form>
         </x-modal>
+
+
 
 
 
@@ -111,13 +136,12 @@
                         ajax: {
                             url: '{{ route('users.userDatatable') }}',
                             data: function(d) {
-                                // Filtrar los roles seleccionados
-                                var selectedRoles = [];
-                                $('.role-filter:checked').each(function() {
-                                    selectedRoles.push($(this).val());
+                                // Adjuntar filtros
+                                const formData = $('#filter-form').serializeArray();
+                                formData.forEach(field => {
+                                    d[field.name] = field.value;
                                 });
-                                d.roles = selectedRoles; // Agregar roles a los parámetros de la petición
-                            }
+                            },
                         },
                         columns: [{
                                 data: 'full_name',
@@ -151,24 +175,34 @@
                             }
                         ],
                         language: {
-                            url: '/js/datatables/i18n/es-ES.json'
+                            paginate: {
+                                previous: "<", // Reemplaza "Anterior" con "<"
+                                next: ">" // Reemplaza "Siguiente" con ">"
+                            },
+
+
+
                         },
                         lengthChange: true, // Desactiva la paginación
-                        pageLength: 15,
+                        pageLength: 10,
                         info: false, // Desactiva la visualización de los registros
-                        lengthMenu: [10, 30, 45],
+                        lengthMenu: [10, 20, 30],
                         initComplete: function() {
                             // Mover el buscador predeterminado al contenedor
                             $('#users-table_filter').appendTo('#custom-search-container');
 
-                            //Mover paginacion al contenedor
-                            $('#users-table_paginate').appendTo('#page-option');
-
                             //Mover mostrar registros al contenedor
-                            $('#users-table_length').appendTo('#page-option');
+                            $('#users-table_length').appendTo('#lengthpage-option');
+
+                            //Mover paginacion al contenedor
+                            $('#users-table_paginate').appendTo('#paginate-option');
 
                             // Eliminar el texto predeterminado
                             $('#users-table_filter label').contents().filter(function() {
+                                return this.nodeType === 3; // Solo los nodos de texto
+                            }).remove();
+
+                            $('#users-table_length label').contents().filter(function() {
                                 return this.nodeType === 3; // Solo los nodos de texto
                             }).remove();
 
@@ -209,21 +243,26 @@
                             $('#filter-modal').addClass('hidden');
                         }
                     });
-                });
-                document.addEventListener('DOMContentLoaded', () => {
-                    Livewire.on('openModal', (modalName, data) => {
-                        if (modalName === 'confirm-user-deletion-modal') {
-                            const modal = document.querySelector(
-                                '[x-data][x-on\\:open-modal\\.window][x-on\\:close-modal\\.window]');
-                            const form = modal.querySelector('#delete-user-form');
-                            const userId = data.id;
+                    document.addEventListener('alpine:init', () => {
+                        Alpine.data('userDeletion', () => ({
+                            userId: null, // Inicializa el ID del usuario
+                            open(id) {
+                                this.userId = id;
+                                // Abre el modal de confirmación de eliminación
+                                this.$dispatch('open-modal', 'user-deletion');
+                            },
+                            submitForm() {
+                                // Modifica la URL de eliminación para incluir el id del usuario
+                                const actionUrl = '/admin/edit-users/' + this
+                                .userId; // Construye la URL con el ID del usuario
+                                document.getElementById('delete-form').action = actionUrl;
+                                document.getElementById('delete-form').submit(); // Envía el formulario
 
-                            // Configurar la acción del formulario
-                            form.action = `/users/${userId}`;
+                                this.$dispatch('close-modal',
+                                'user-deletion'); // Cerrar el modal después de enviar
 
-                            // Mostrar el modal
-                            modal.__x.$data.show = true;
-                        }
+                            }
+                        }));
                     });
                 });
             </script>

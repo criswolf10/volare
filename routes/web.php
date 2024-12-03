@@ -18,19 +18,18 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Ruta para mostrar la vista de vuelos
+// Rutas para el CRUD de vuelos
 Route::get('/flights', [FlightController::class, 'index'])->name('flights');
+Route::get('/flights/data', [FlightController::class, 'getFlightData'])->name('flights.flightDatatable');
+Route::get('/admin/create-flights', function () {return view('admin.create-flights');})->name('create-flights');
+Route::patch('/admin/create-flights', [UserController::class, 'flightCreate'])->name('flight-create');
 
-// Ruta para obtener los datos de los vuelos (Yajra DataTables)
-Route::get('/flights/data', [FlightController::class, 'getFlights'])->name('flights.getFlights');
 
-
-Route::middleware('auth')->group(function () {
 
 // Rutas para el CRUD de tickets
 Route::get('/sales', [TicketController::class, 'index'])->name('sales');
 
-
+Route::middleware(['auth'])->group(function () {
 // Rutas para el CRUD de usuarios
 Route::get('/users', [UserController::class, 'index'])->name('users');
 Route::get('/users/data', [UserController::class, 'getUserData'])->name('users.userDatatable');
@@ -38,8 +37,12 @@ Route::get('/admin/create-users', function () {return view('admin.create-users')
 Route::patch('/admin/create-users', [UserController::class, 'userCreate'])->name('user-create');
 Route::get('/admin/edit-users/{id}', [UserController::class, 'userEdit'])->name('edit-users');
 Route::patch('/admin/edit-users/{id}', [UserController::class, 'userUpdate'])->name('user-update');
-Route::delete('/admin/edit-users/{id}', [UserController::class, 'userDelete'])->name('user-delete');
-Route::
+Route::delete('/admin/edit-users/{id}', [UserController::class, 'destroy'])->name('user-delete');
+
+
+
+});
+
 
 Route::get('/sales/data', [TicketController::class, 'getMyTickets'])->name('sales.getTickets');
 
@@ -51,7 +54,7 @@ Route::delete('/profile/{user}', [ProfileController::class, 'deletePhoto'])->nam
 Route::patch('/profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
 Route::put('password', [ProfileController::class, 'updatePassword'])->name('password.update');
 Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+
 
 
 

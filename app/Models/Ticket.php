@@ -19,6 +19,7 @@ class Ticket extends Model
         'flight_code',
         'price',
         'purchase_date',
+        'quantity',
     ];
 
     /**

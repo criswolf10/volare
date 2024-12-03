@@ -1,10 +1,9 @@
 <?php
-
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
+use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
 {
@@ -13,14 +12,26 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Asegurarse de que el rol 'client' existe
-        $clientRole = Role::firstOrCreate(['name' => 'client']);
+        // Crear roles si no existen
+        Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'client', 'guard_name' => 'web']);
 
-        // Crear otros usuarios y asignarles el rol 'client'
-        User::factory(10)->create()->each(function ($user) use ($clientRole) {
-            if ($user->id !== 1) {
-                $user->assignRole($clientRole);
-            }
+        // Crear usuario admin "Cristian Lobo" y asignarle el rol admin
+        $adminRole = Role::where('name', 'admin')->first();
+        $admin = User::create([
+            'name' => 'Cristian',
+            'lastname' => 'Lobo',
+            'email' => 'cristianlobojimenez10@gmail.com',
+            'password' => bcrypt('password'), // Asegúrate de usar una contraseña segura
+            'phone' => '625 877 564',
+            'created_at' => now(),
+        ]);
+        $admin->assignRole($adminRole);
+
+        // Crear 60 usuarios aleatorios y asignarles el rol client
+        $clientRole = Role::where('name', 'client')->first();
+        User::factory(60)->create()->each(function ($user) use ($clientRole) {
+            $user->assignRole($clientRole);
         });
     }
 }

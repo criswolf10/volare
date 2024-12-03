@@ -108,9 +108,31 @@
     </div>
 
 </section>
+
+{{-- Sección de Eliminación --}}
 <section class="space-y-6 mt-5">
-    <div class="flex flex-col justify-start bg-white shadow-lg rounded-lg p-5 gap-2">
-        <h2 class="text-lg xl:text-2xl font-medium text-gray-900 ">
+    {{-- Modal de Éxito --}}
+    @if (session('success'))
+        <x-modal name="user-delete-modal" show="true">
+            <!-- Mensaje de éxito -->
+            <div class="text-center py-8">
+                <h3 class="text-xl font-semibold text-green-600">¡Usuario eliminado correctamente!</h3>
+                <p class="mt-2 text-gray-600">Pulse en aceptar para volver a gestión de usuarios</p>
+            </div>
+
+            <!-- Botón de acción -->
+            <div class="flex justify-around mb-6">
+                <a href="{{ route('users') }}"
+                    class="px-4 py-2 bg-[#22B3B2] hover:bg-opacity-75 text-white rounded-lg">
+                    Aceptar
+                </a>
+            </div>
+        </x-modal>
+    @endif
+
+
+    <div class="flex flex-col justify-start bg-white shadow-lg rounded-lg p-5 gap-2" x-data="{ modalOpen: false }">
+        <h2 class="text-lg xl:text-2xl font-medium text-gray-900">
             {{ __('Delete user') }}
         </h2>
 
@@ -118,25 +140,26 @@
             {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. This action cannot be undone.') }}
         </p>
 
-
-        <x-danger-button class="xl:w-[25%]" x-data=""
-            x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')">
-            {{ __('Delete user') }}
+        {{-- Botón de eliminar usuario --}}
+        <x-danger-button class="xl:w-[25%]" x-on:click.prevent="$dispatch('open-modal', 'user-deletion')">
+            {{ __('Delete Account') }}
         </x-danger-button>
 
-        <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
-            <form method="post" action="{{ route('user-delete', ['id' => $user->id]) }}" class="p-6">
+        <!-- Modal de Confirmación de Eliminación -->
+        <x-modal name="user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
+            <form method="POST" action="{{ route('user-delete', ['id' => $user->id]) }}" class="p-6">
                 @csrf
-                @method('delete')
+                @method('DELETE')
 
-                <h2 class="text-lg font-medium text-gray-900 ">
-                    {{ __('¿Estás seguro que quieres eliminar este usuario?.') }}
+                <h2 class="text-lg font-medium text-gray-900">
+                    {{ __('Are you sure you want to delete this user :user?', ['user' => $user->name]) }}
                 </h2>
 
-                <p class="mt-1 text-sm text-gray-600 ">
-                    {{ __('Si estas seguro, introduce la contraseña de tu cuenta administrador para eliminarlo.') }}
+                <p class="mt-1 text-sm text-gray-600">
+                    {{ __('If you are sure, enter the password of your administrator account to confirm it.') }}
                 </p>
 
+                {{-- Campo de Contraseña --}}
                 <div class="mt-6">
                     <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
                     <x-text-input id="password" name="password" type="password" class="mt-1 block w-3/4"
@@ -144,6 +167,7 @@
                     <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
                 </div>
 
+                {{-- Botón de Confirmar Eliminación --}}
                 <div class="mt-6 flex justify-center">
                     <x-danger-button>
                         {{ __('Delete user') }}
@@ -151,5 +175,6 @@
                 </div>
             </form>
         </x-modal>
+
     </div>
 </section>

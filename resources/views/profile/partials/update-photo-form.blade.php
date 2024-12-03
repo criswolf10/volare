@@ -13,7 +13,7 @@
         @method('PUT')
         <div class="flex flex-col justify-start xl:flex-row xl:items-center xl:gap-7">
             <!-- Mostrar la foto de perfil actual -->
-            <div class="mb-2">
+            <div class="mb-4">
                 <img src="{{ $user->getFirstMediaUrl('profile_photos') ?: asset('img/avatar.png') }}"
                     alt="Foto de perfil" class="w-24 h-24 xl:w-32 xl:h-32 rounded-full object-cover">
             </div>

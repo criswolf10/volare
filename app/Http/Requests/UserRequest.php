@@ -22,7 +22,6 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userId = $this->route('id'); // Captura el ID del usuario de la ruta (solo aplica en edición)
 
         return [
             'name'=> ['required', 'string', 'min:3', 'max:40'],
@@ -32,7 +31,7 @@ class UserRequest extends FormRequest
                 'string',
                 'email',
                 'max:255',
-                "unique:users,email,{$userId}" // Ignorar unicidad para el usuario actual en edición
+                "unique:users,email" // Ignorar unicidad para el usuario actual en edición
             ],
             'password' => [
                 $this->isMethod('patch') ? 'nullable' : 'required', // Contraseña solo requerida en creación
@@ -44,10 +43,10 @@ class UserRequest extends FormRequest
                     ->symbols(),
             ],
             'phone' => [
-                'required',
-                'digits:9',
-                "unique:users,phone,{$userId}" // Ignorar unicidad para el usuario actual en edición
-            ],
+            'required',
+            'regex:/^\d{3}\d{3}\d{3}$/', // Validación para el formato 'xxx xxx xxx'
+            "unique:users,phone" // Ignorar unicidad para el usuario actual en edición
+        ],
         ];
     }
 
@@ -62,5 +61,26 @@ class UserRequest extends FormRequest
         'password.confirmed' => 'The passwords do not match.',
     ];
 }
+
+public function getValidatedData()
+{
+    // Obtener los datos validados
+    $data = $this->validated();
+
+    // Formatear el teléfono al formato 'xxx xxx xxx'
+    $data['phone'] = $this->formatPhoneNumber($data['phone']);
+
+    return $data;
+}
+
+protected function formatPhoneNumber($phone)
+{
+    // Elimina cualquier carácter no numérico
+    $phone = preg_replace('/\D/', '', $phone);
+
+    // Formatea el número como 'xxx xxx xxx'
+    return substr($phone, 0, 3) . ' ' . substr($phone, 3, 3) . ' ' . substr($phone, 6, 3);
+}
+
 
 }

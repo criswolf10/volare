@@ -1,6 +1,3 @@
-
-
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -21,6 +18,7 @@ return new class extends Migration
             $table->foreign('flight_code')->references('code')->on('flights')->cascadeOnDelete();
             $table->decimal('price', 10, 2); // Precio con dos decimales
             $table->date('purchase_date'); // Fecha de compra
+            $table->unsignedInteger('quantity')->default(1); // Número de boletos comprados
             $table->timestamps();
             // Clave foránea para relacionar con la tabla flights
 
@@ -35,3 +33,4 @@ return new class extends Migration
         Schema::dropIfExists('tickets');
     }
 };
+
