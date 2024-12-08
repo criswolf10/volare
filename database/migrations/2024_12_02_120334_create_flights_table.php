@@ -22,7 +22,7 @@ return new class extends Migration
             $table->date('departure_date'); // Fecha de salida
             $table->time('departure_time'); // Hora de salida
             $table->time('arrival_time'); // Hora de llegada
-            $table->enum('status', ['borrador', 'en espera', 'en trayecto', 'completo', 'cancelado']);
+
             $table->timestamps(); // created_at y updated_at
         });
     }

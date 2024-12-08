@@ -1,6 +1,7 @@
 <?php
 namespace Database\Seeders;
 
+use App\Models\Ticket;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Database\Seeder;
@@ -22,16 +23,40 @@ class UserSeeder extends Seeder
             'name' => 'Cristian',
             'lastname' => 'Lobo',
             'email' => 'cristianlobojimenez10@gmail.com',
-            'password' => bcrypt('password'), // Asegúrate de usar una contraseña segura
+            'password' => bcrypt('password'),
             'phone' => '625 877 564',
             'created_at' => now(),
         ]);
         $admin->assignRole($adminRole);
 
+        //Crear usuario cliente "Maria Berdun" y asignarle el rol client
+        $clientRole = Role::where('name', 'client')->first();
+        $client = User::create([
+            'name' => 'Maria',
+            'lastname' => 'Berdun',
+            'email' => 'maria@gmail.com',
+            'password' => bcrypt('password'),
+            'phone' => '651 465 442',
+            'created_at' => now(),
+        ]);
+        $client->assignRole($clientRole);
+
         // Crear 60 usuarios aleatorios y asignarles el rol client
         $clientRole = Role::where('name', 'client')->first();
         User::factory(20)->create()->each(function ($user) use ($clientRole) {
             $user->assignRole($clientRole);
-        });
+                        // Obtener una cantidad aleatoria de tickets no asignados
+                        $tickets = Ticket::whereNull('user_id')
+                        ->inRandomOrder()
+                        ->take(rand(1, 5))
+                        ->get();
+
+                    // Asignar esos tickets al usuario
+                    foreach ($tickets as $ticket) {
+                        $ticket->update(['user_id' => $user->id]);
+                    }
+                });
+
+        }
     }
-}
+

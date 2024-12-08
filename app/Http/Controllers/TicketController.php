@@ -3,105 +3,76 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
-use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Flight;
+use App\Http\Requests\TicketRequest;
+use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
 class TicketController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Mostrar una lista de todos los tickets.
      */
     public function index()
     {
-        return view("tickets");
+        $tickets = Ticket::all();
+        return view('tickets', compact('tickets'));
     }
 
-
-
     /**
-     * Store a newly created resource in storage.
+     * Mostrar el formulario para crear un nuevo ticket.
      */
-    public function store(Request $request)
+    public function create()
     {
-        //
-
+        $flights = Flight::all();  // Obtener todos los vuelos disponibles
+        return view('purchase-form', compact('flights'));
     }
 
+    /**
+     * Almacenar un nuevo ticket en la base de datos.
+     */
+    public function store(TicketRequest $request)
+    {
+        $data = $request->validated();  // Validar los datos
 
+        // Crear el ticket con los asientos seleccionados
+        $ticket = Ticket::create($data);
 
+        // Relacionar los asientos con el ticket
+        $ticket->seats = $request->seats;
+        $ticket->save();
 
+        return redirect()->route('tickets')->with('success', 'Ticket comprado exitosamente.');
+    }
 
     /**
-     * Show the form for editing the specified resource.
+     * Mostrar el formulario para editar un ticket existente.
      */
     public function edit(Ticket $ticket)
     {
-        //
+        $flights = Flight::all();  // Obtener todos los vuelos disponibles
+        return view('tickets.edit', compact('ticket', 'flights'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Actualizar un ticket existente en la base de datos.
      */
-    public function update(Request $request, Ticket $ticket)
+    public function update(TicketRequest $request, Ticket $ticket)
     {
-        //
+        $data = $request->validated();
+        $ticket->update($data);  // Actualizar el ticket
+        $ticket->seats = $request->seats; // Actualizar los asientos
+        $ticket->save();
+
+        return redirect()->route('tickets')->with('success', 'Ticket actualizado exitosamente.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Eliminar un ticket de la base de datos.
      */
     public function destroy(Ticket $ticket)
     {
-        //
+        $ticket->delete();
+        return redirect()->route('tickets')->with('success', 'Ticket eliminado exitosamente.');
     }
-
-    public function getTicketsData(Request $request)
-    {
-        if ($request->ajax()) {
-            // Asegúrate de cargar las relaciones correctamente
-            $query = Ticket::with([
-                'user:id,name,lastname',
-                'flight:id,code,origin,destination,duration',
-                'flight.aircraft:id,seat_codes' // Asegúrate de cargar el avión con el código de asiento
-            ]);
-            return DataTables::of($query)
-                ->addColumn('full_name', function ($ticket) {
-                    return $ticket->user->name . ' ' . $ticket->user->lastname;
-                })
-                ->addColumn('code', function ($ticket) {
-                    // Verificar si la relación 'flight' existe antes de acceder a 'code'
-                    return $ticket->flight ? $ticket->flight->code : 'N/A';
-                })
-                ->addColumn('origin', function ($ticket) {
-                    // Verificar si la relación 'flight' existe antes de acceder a 'origin'
-                    return $ticket->flight ? $ticket->flight->origin : 'N/A';
-                })
-                ->addColumn('destination', function ($ticket) {
-                    // Verificar si la relación 'flight' existe antes de acceder a 'destination'
-                    return $ticket->flight ? $ticket->flight->destination : 'N/A';
-                })
-                ->addColumn('duration', function ($ticket) {
-                    // Verificar si la relación 'flight' existe antes de acceder a 'duration'
-                    return $ticket->flight ? $ticket->flight->duration : 'N/A';
-                })
-                ->addColumn('seats_codes', function ($ticket) {
-                    // Verificar si la relación 'flight' y 'aircraft' existen antes de acceder a 'seats_codes'
-                    return ($ticket->flight && $ticket->flight->aircraft)
-                        ? implode(", ", $ticket->flight->aircraft->seat_codes)
-                        : 'N/A';
-                })
-                ->addColumn('purchase_date', function ($ticket) {
-                    return $ticket->purchase_date ? $ticket->purchase_date->format('d/m/Y') : 'N/A';
-                })
-                ->addColumn('action', function ($ticket) {
-                    return '<a href="#" class="btn btn-primary">Editar</a>';
-                })
-                ->rawColumns(['action'])
-                ->make(true);
-        }
-    }
-
-
 }

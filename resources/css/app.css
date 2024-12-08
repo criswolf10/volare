@@ -61,11 +61,15 @@
 
 td , th {
 
+
     text-align: start;
     font-size: 0.9rem;
 
 }
 
+tbody{
+    text-align: center;
+}
 
 #action-btn{
     display: flex;

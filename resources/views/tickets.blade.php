@@ -4,7 +4,7 @@
 
     @section('content')
     <div class=" p-5 h-full w-full">
-        <div class="flex justify-center items-center w-full mb-6 p-3">
+        <div class="flex justify-start items-center w-full mb-6 p-3">
 
             <!-- Contenedor de los botones de filtro y añadir usuario -->
             <div class="flex justify-start items-center w-[50%] gap-5">
@@ -33,7 +33,7 @@
                         <th>duración</th>
                         <th>cantidad</th>
                         <th>precio</th>
-                        <th>asientos</th>
+                        <th>Nº asiento</th>
                         <th>fecha de compra</th>
                         <th>Acciones</th>
                     </tr>
@@ -104,8 +104,8 @@
                             orderable: false
                         },
                         {
-                            data: 'seats_codes',
-                            name: 'seats_codes',
+                            data: 'seats',
+                            name: 'seats',
                             orderable: false
                         },
                         {

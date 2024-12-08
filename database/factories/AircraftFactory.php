@@ -9,70 +9,61 @@ class AircraftFactory extends Factory
 {
     protected $model = Aircraft::class;
 
-    public function definition()
+    public function definition(): array
     {
-        // Definimos las opciones válidas para el nombre del avión
-        $names = ['Boing', 'Airbus', 'Apache', 'T-rex', 'Falcon', 'Halcon', 'Condor', 'Eagle', 'Hawk', 'Sparrow'];
-        // Generamos el nombre aleatoriamente de las opciones
-        $name = $this->faker->randomElement($names);
+        // Capacidad del avión: siempre múltiplo de 6
+        $capacity = $this->faker->numberBetween(102, 240);
+        $capacity = $capacity - ($capacity % 6); // Asegurarse de que la capacidad sea múltiplo de 6
 
-        // Generamos el código del avión con 3 dígitos seguidos de una letra (mayúscula)
-        $code = $this->faker->numberBetween(100, 999) . strtoupper($this->faker->randomLetter());
-
-        $totalSeats = 180; // Capacidad total del avión
-        $firstClassRows = 5;
-        $secondClassRows = 8;
-        $economyClassRows = 17;
-
-        // Generamos los códigos de los asientos
-        $seatCodes = $this->generateSeatCodes($firstClassRows, $secondClassRows, $economyClassRows);
+        // Generar distribución de asientos
+        $seats = $this->generateSeats($capacity);
 
         return [
-            'name' => $name,
-            'code' => $code, // Código con 3 dígitos y una letra mayúscula
-            'capacity' => $totalSeats,
-            'seat_classes' => json_encode([
-                'first_class' => '1ª clase',
-                'second_class' => '2ª clase',
-                'economy_class' => 'turista',
-            ]),
-            'seat_codes' => json_encode($seatCodes),
+            'name' => $this->faker->word . ' ' . $this->faker->numberBetween(100, 999),
+            'capacity' => $capacity,
+            'seats' => json_encode($seats), // Guardar distribución como JSON
         ];
     }
 
-    // Genera los códigos de asiento para cada clase
-    private function generateSeatCodes($firstClassRows, $secondClassRows, $economyClassRows)
+    private function generateSeats(int $capacity): array
     {
-        $columns = ['A', 'B', 'C', 'D', 'E', 'F']; // 6 columnas por fila
+        if ($capacity % 6 !== 0) {
+            throw new \InvalidArgumentException("La capacidad debe ser un múltiplo de 6.");
+        }
 
-        // Códigos de asiento para las clases
-        $seatCodes = [
-            'first_class' => [],
-            'second_class' => [],
-            'economy_class' => [],
+        $firstClassPercentage = 0.18;
+        $secondClassPercentage = 0.30;
+        $touristClassPercentage = 0.54;
+
+        $firstClassSeats = round($capacity * $firstClassPercentage);
+        $secondClassSeats = round($capacity * $secondClassPercentage);
+        $touristSeats = $capacity - $firstClassSeats - $secondClassSeats;
+
+        $distribution = [
+            '1ª clase' => [],
+            '2ª clase' => [],
+            'turista' => [],
         ];
 
-        // 1ª clase
-        for ($row = 1; $row <= $firstClassRows; $row++) {
-            foreach ($columns as $column) {
-                $seatCodes['first_class'][] = $column . $row;
+        $currentRow = 1;
+        $seatClasses = [
+            '1ª clase' => $firstClassSeats,
+            '2ª clase' => $secondClassSeats,
+            'turista' => $touristSeats,
+        ];
+
+        foreach ($seatClasses as $class => $seats) {
+            for ($i = 0; $i < $seats; $i++) {
+                $seatLetter = chr(65 + ($i % 6)); // Letras A-F
+                $seatNumber = $currentRow;
+                $distribution[$class][] = "{$seatLetter}{$seatNumber}";
+
+                if (($i + 1) % 6 === 0) {
+                    $currentRow++;
+                }
             }
         }
 
-        // 2ª clase
-        for ($row = $firstClassRows + 1; $row <= $firstClassRows + $secondClassRows; $row++) {
-            foreach ($columns as $column) {
-                $seatCodes['second_class'][] = $column . $row;
-            }
-        }
-
-        // Clase turista
-        for ($row = $firstClassRows + $secondClassRows + 1; $row <= $firstClassRows + $secondClassRows + $economyClassRows; $row++) {
-            foreach ($columns as $column) {
-                $seatCodes['turist'][] = $column . $row;
-            }
-        }
-
-        return $seatCodes;
+        return $distribution;
     }
 }

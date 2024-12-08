@@ -14,15 +14,16 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id(); // ID único como clave primaria
             $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // Relación con usuarios
-            $table->foreignId('flight_id')->constrained('flights')->cascadeOnDelete();
-            $table->decimal('price', 10, 2); // Precio con dos decimales
+            $table->foreignId('flight_id')->constrained('flights')->cascadeOnDelete(); // Relación con vuelos
+            $table->string('booking_code')->unique(); // Código de reserva
+            $table->string('seat'); // Columna para el asiento asignado
+            $table->decimal('price', 10, 2); // Precio total de los tickets comprados
+            $table->integer('quantity'); // Cantidad de tickets comprados
             $table->date('purchase_date'); // Fecha de compra
-            $table->unsignedInteger('quantity'); // Número de boletos comprados
             $table->timestamps();
-            // Clave foránea para relacionar con la tabla flights
-
         });
     }
+
 
     /**
      * Reverse the migrations.

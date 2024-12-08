@@ -10,15 +10,25 @@ class Ticket extends Model
     use HasFactory;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'tickets';
+
+
+    /**
      * Los atributos que se pueden asignar masivamente.
      *
      * @var array
      */
     protected $fillable = [
         'user_id',
-        'flight_code',
+        'flight_id',
+        'booking_code',
         'price',
         'purchase_date',
+        'seat',
         'quantity',
     ];
 
@@ -28,8 +38,8 @@ class Ticket extends Model
      * @var array
      */
     protected $casts = [
-        'price' => 'decimal:2', // Formato decimal con 2 decimales
-        'purchase_date' => 'date', // Fecha como instancia de Carbon
+        'purchase_date' => 'datetime', // La fecha se convertirá a una instancia de Carbon
+        'seat' => 'array',  // Los asientos se almacenarán como un array
     ];
 
     /**
@@ -50,5 +60,24 @@ class Ticket extends Model
     public function flight()
     {
         return $this->belongsTo(Flight::class);
+    }
+
+
+    /**
+     * Validar que un asiento único no pueda estar asignado dos veces en el mismo vuelo.
+     */
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($ticket) {
+            $exists = Ticket::where('flight_id', $ticket->flight_id)
+                ->where('seat', $ticket->seat)
+                ->exists();
+
+            if ($exists) {
+                throw new \Exception("El asiento {$ticket->seat} ya está asignado en el vuelo {$ticket->flight_id}");
+            }
+        });
     }
 }

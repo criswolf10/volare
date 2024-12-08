@@ -241,30 +241,8 @@
                             $('#filter-modal').addClass('hidden');
                         }
                     });
-                    document.addEventListener('alpine:init', () => {
-                        Alpine.data('userDeletion', () => ({
-                            userId: null, // Inicializa el ID del usuario
-                            open(id) {
-                                this.userId = id;
-                                // Abre el modal de confirmación de eliminación
-                                this.$dispatch('open-modal', 'user-deletion');
-                            },
-                            submitForm() {
-                                // Modifica la URL de eliminación para incluir el id del usuario
-                                const actionUrl = '/admin/edit-users/' + this
-                                .userId; // Construye la URL con el ID del usuario
-                                document.getElementById('delete-form').action = actionUrl;
-                                document.getElementById('delete-form').submit(); // Envía el formulario
-
-                                this.$dispatch('close-modal',
-                                'user-deletion'); // Cerrar el modal después de enviar
-
-                            }
-                        }));
-                    });
                 });
             </script>
         @endpush
-
     @endsection
 </x-app-layout>

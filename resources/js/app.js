@@ -32,7 +32,58 @@ menuToggle.addEventListener("click", () => {
 });
 
 
+// Variables para el slider, diapositivas y controles
 
+document.addEventListener('DOMContentLoaded', () => {
+    const slider = document.querySelector('[data-slider]');
+    const slides = slider.children;
+    const prevButton = document.querySelector('[data-prev]');
+    const nextButton = document.querySelector('[data-next]');
+    let currentIndex = 0;
 
+    // Define el tiempo entre cada slide (5 segundos)
+    const intervalTime = 5000;
+    let autoSlide;
 
+    const updateSlider = () => {
+        const totalSlides = slides.length;
+        const offset = -(currentIndex * 100); // Desplaza el slider al slide actual
+        slider.style.transform = `translateX(${offset}%)`;
 
+        // Reinicia el índice si llega al final
+        if (currentIndex >= totalSlides - 1) {
+            currentIndex = 0;
+        } else {
+            currentIndex++;
+        }
+    };
+
+    const startAutoSlide = () => {
+        autoSlide = setInterval(() => {
+            updateSlider();
+        }, intervalTime);
+    };
+
+    const stopAutoSlide = () => {
+        clearInterval(autoSlide);
+    };
+
+    // Botón "Anterior"
+    prevButton.addEventListener('click', () => {
+        stopAutoSlide();
+        currentIndex = (currentIndex === 0) ? slides.length - 1 : currentIndex - 1;
+        updateSlider();
+        startAutoSlide();
+    });
+
+    // Botón "Siguiente"
+    nextButton.addEventListener('click', () => {
+        stopAutoSlide();
+        currentIndex = (currentIndex + 1) % slides.length;
+        updateSlider();
+        startAutoSlide();
+    });
+
+    // Inicia el slider automático
+    startAutoSlide();
+});

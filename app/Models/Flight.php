@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use App\Models\Aircraft;
+use App\Models\TicketSeat;
 
 class Flight extends Model implements HasMedia
 {
@@ -17,13 +19,6 @@ class Flight extends Model implements HasMedia
      * @var string
      */
     protected $table = 'flights';
-
-    /**
-     * The primary key for the model.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'code'; // Clave primaria personalizada
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -44,7 +39,7 @@ class Flight extends Model implements HasMedia
      *
      * @var array
      */
-    protected $fillable = ['code', 'origin', 'destination', 'duration', 'departure_date', 'departure_time', 'arrival_time', 'status'];
+    protected $fillable = ['code', 'origin', 'destination', 'duration', 'departure_date', 'departure_time', 'arrival_time'];
 
 
 
@@ -56,21 +51,26 @@ class Flight extends Model implements HasMedia
      */
 
     /**
-     * Relación con los tickets.
+     * Un vuelo pertenece a un avión.
      */
-    public function tickets()
-    {
-        return $this->hasMany(Ticket::class );
-    }
 
     public function aircraft()
     {
         return $this->belongsTo(Aircraft::class);
     }
 
-public function registerMediaCollections(): void
-{
-    $this->addMediaCollection('flight_images')->useDisk('public')->singleFile(); // Almacena solo una imagen
-}
+    /**
+     * Relación con el modelo `Ticket`.
+     *
+     * Un vuelo tiene muchos tickets asociados.
+     */
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('flight_images')->useDisk('public')->singleFile(); // Almacena solo una imagen
+    }
 }

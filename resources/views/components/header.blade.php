@@ -1,6 +1,7 @@
 <!-- Logo -->
+
 <div class="flex p-5 justify-start items-center sm:ml-5">
-    <a href="{{ route('home') }}">
+    <a href="{{ auth()->user() && auth()->user()->hasRole('admin') ? route('dashboard') : route('home') }}">
         <img src="{{ asset('img/logo-index.png') }}" alt="App-Logo"
             class="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16 ">
     </a>
@@ -51,7 +52,7 @@
                 </a>
             </div>
             @if (Route::has('login'))
-                <div class="flex items-center justify-center mr-3 mb-3">
+                <div class="flex items-center justify-center mr-3">
                     <x-tertiary-button onclick="window.location.href='{{ route('login') }}'">
                         Iniciar sesión
                     </x-tertiary-button>

@@ -7,14 +7,9 @@ use App\Models\Aircraft;
 
 class AircraftSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
-        // Usando el factory para generar  aviones
-        Aircraft::factory()->count(6)->create();
+        // Generar 10 aviones de prueba
+        Aircraft::factory()->count(10)->create();
     }
 }

@@ -1,19 +1,19 @@
 <?php
 
+// FlightSeeder.php
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Flight;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
+use App\Models\Ticket;
 
 class FlightSeeder extends Seeder
 {
-    public function run(): void
+    public function run()
     {
-        Flight::factory(6)->create();
-
-
+        // Crear vuelos con tickets asignados
+        Flight::factory()
+            ->count(10)
+            ->create();
     }
 }

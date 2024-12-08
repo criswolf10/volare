@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Http\Requests\FlightRequest;
+use App\Http\Requests\UserRequest;
 use App\Models\Flight;
+use App\Models\Aircraft;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -21,25 +25,23 @@ class FlightController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        // Puedes incluir datos adicionales si son necesarios, como una lista de aviones disponibles
+        $aircrafts = Aircraft::all(); // Obtener los aviones disponibles
+        return view('admin.create-flights', compact('aircrafts'));
+    }
+
+
+    /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) {
-
-        // Validar los datos del formulario
-        $request->validate([
-            'code' => 'required|string|max:5|unique:flights,code',
-            'origin' => 'required|string|max:255',
-            'destination' => 'required|string|max:255',
-            'duration' => 'required|date_format:H:i',
-            'departure_date' => 'required|date',
-            'departure_time' => 'required|date_format:H:i',
-            'arrival_time' => 'required|date_format:H:i',
-            'status' => ['required', Rule::in(['borrador', 'en espera', 'en trayecto', 'completo', 'cancelado'])],
-            'aircraft_id' => 'required|exists:aircrafts,id',
-        ]);
-
+    public function store(FlightRequest $request)
+    {
         // Crear un nuevo vuelo con los datos validados
-        $flight = Flight::create($request->all());
+        $flight = Flight::create($request->validated());
 
         // Asignar la imagen por defecto al vuelo
         $defaultImageUrl = 'icons/flights.svg';
@@ -52,107 +54,72 @@ class FlightController extends Controller
         return redirect()->route('flights')->with('success', '¡Vuelo creado correctamente!');
     }
 
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id)
+    {
+        $aircrafts = Aircraft::all(); // Obtener aviones disponibles para editar la relación
+        $flight = Flight::findOrFail($id); // Buscar el vuelo por ID
+        return view('admin.edit-flights', compact('flight', 'aircrafts'));
+    }
+
+
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Flight $flight) {}
+    public function update(FlightRequest $request)
+    {
+        // Buscar el vuelo por ID
+        $flight = Flight::findOrFail($request->route('id'));
+
+        // Actualizar el vuelo con los datos validados
+        $flight->update($request->all());
+
+        // Guardar los cambios
+        $flight->save();
+
+
+
+        // Redireccionar a la vista de vuelos con un mensaje
+        return redirect()->route('flights')->with('success', '¡Vuelo actualizado correctamente!');
+    }
+
+
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Flight $flight) {}
-
-
-    public function getFlightData(Request $request)
+    public function destroy(UserRequest $request , $id)
     {
-        if ($request->ajax()) {
-            // Consulta inicial para incluir relaciones
-            $query = Flight::with(['aircraft:id,name,code,seat_classes', 'tickets:id,flight_id,price', 'media']);
+        //Validar contraseña del usuario para la eliminacion
+        $request->validate([
+            'password' => 'required|string',
+        ]);
 
-            // Devuelve datos formateados para DataTables
-            return DataTables::of($query)
-            ->addColumn('image', function ($flight) {
-                // Obtener la URL de la imagen asociada al vuelo
-                $media = $flight->getFirstMedia('flight_images');
-                $imageUrl = $media ? $media->getUrl() : asset('icons/flights.svg'); // Imagen predeterminada si no tiene una
+        //Obtener el usuario administrador autenticado
+        $adminUser = Auth::user();
 
-                // Mostrar la imagen al lado del código del vuelo
-                return '<img src="' . $imageUrl . '" alt="Imagen de vuelo" style="width: 30px; height: auto; margin-right: 10px;">' ;
-            })
-                ->addColumn('aircraft', function ($flight) {
-                    return $flight->aircraft
-                        ? "{$flight->aircraft->name} - {$flight->aircraft->code}"
-                        : 'N/A';
-                })
-                ->addColumn('price', function ($flight) {
-                    // Mostrar el precio del primer ticket en formato de euros
-                    $price = $flight->tickets->isNotEmpty()
-                        ? $flight->tickets->first()->price
-                        : 0;
-                    return $price % 1 == 0
-                        ? number_format($price, 0, ',', '.') . '€' // Sin decimales si es un número entero
-                        : number_format($price, 2, ',', '.') . '€'; // Con decimales si es un número flotante
-                })
-                ->addColumn('seat_classes', function ($flight) {
-                    $seatClasses = json_decode($flight->aircraft->seat_classes, true);
-                    return $seatClasses ? implode(', ', $seatClasses) : 'N/A';
-                })
-                ->addColumn('departure_date', function ($flight) {
-                    // Formatear la fecha de salida en d/m/y
-                    return Carbon::parse($flight->departure_date)->format('d/m/Y');
-                })
-                ->addColumn('duration', function ($flight) {
-                    // Parsear el tiempo (tipo TIME) usando Carbon
-                    $time = Carbon::parse($flight->departure_time);
-
-                    // Si la hora es "00:00:00", mostrar un valor por defecto
-                    if ($time->hour == 0 && $time->minute == 0) {
-                        return 'Hora no válida'; // Si la hora es "00:00:00"
-                    }
-
-                    // Convertir la hora a formato "X h Y min"
-                    $hours = $time->hour;
-                    $minutes = $time->minute;
-
-                    // Si la hora y los minutos son 0, mostrar un mensaje adecuado
-                    if ($hours == 0) {
-                        return "{$minutes} min"; // Si solo hay minutos
-                    }
-
-                    return "{$hours} h {$minutes} min"; // Si hay horas y minutos
-                })
-                ->addColumn('status', function ($flight) {
-                    $status = $flight->status;
-                    $statusColor = '';
-
-                    // Asignar colores según el estado
-                    switch ($status) {
-                        case 'borrador':
-                            $statusColor = '#6c757d'; // Gris
-                            break;
-                        case 'en espera':
-                            $statusColor = '#ffc107'; // Amarillo
-                            break;
-                        case 'en trayecto':
-                            $statusColor = '#17a2b8'; // Azul
-                            break;
-                        case 'completo':
-                            $statusColor = '#28a745'; // Verde
-                            break;
-                        case 'cancelado':
-                            $statusColor = '#dc3545'; // Rojo
-                            break;
-                    }
-
-                    // Retornar el estado con el color de fondo aplicado directamente
-                    return "<div style='background-color: {$statusColor}; color: white; padding: 3px 7px; border-radius: 5px; font-size: 0.75rem; text-align: center;'>" . ucfirst($status) . "</div>";
-                })
-                ->addColumn('action', function ($row) {
-                    return '<a href="#" class="btn btn-sm btn-primary edit">Editar</a>
-                            <a href="#" class="btn btn-sm btn-danger delete">Eliminar</a>';
-                })
-                ->rawColumns(['action', 'status', 'image']) // Permite HTML en la columna de acción
-                ->make(true);
+        //Verificar si la contraseña del usuario autenticado es correcta
+        // Verificar que la contraseña es correcta
+        if (!Hash::check($request->password, $adminUser->password)) {
+            return redirect()
+                ->back()
+                ->withErrors(['password' => 'La contraseña ingresada no es correcta.'])
+                ->withInput();
         }
+
+        // Buscar el vuelo por ID
+        $flight = Flight::findOrFail($id);
+
+        // Eliminar el vuelo
+        $flight->delete();
+
+        // Redirigir con mensaje de éxito
+        return redirect()
+            ->route('flights')
+            ->with('success', 'Vuelo eliminado exitosamente.');
     }
 }

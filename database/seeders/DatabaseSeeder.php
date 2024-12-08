@@ -11,16 +11,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Llamar al UserSeeder para gestionar la creación de usuarios y asignación de roles
+        // Llamar al UserSeeder para gestionar la creación de usuarios y asignación de roles , al FlightSeeder para la creación de vuelos y al AircraftSeeder para la creación de aviones
         $this->call([
             UserSeeder::class,
-        ]);
-
-        // Llamar a los seeders de vuelos, ventas y tickets
-        $this->call([
+            AircraftSeeder::class,
             FlightSeeder::class,
             TicketSeeder::class,
-            AircraftSeeder::class,
+
         ]);
     }
 }

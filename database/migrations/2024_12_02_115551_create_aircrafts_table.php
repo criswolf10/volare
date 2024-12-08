@@ -12,19 +12,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('aircrafts', function (Blueprint $table) {
-            $table->id();
-            $table->enum('name',['Boing', 'Airbus', 'Apache', 'T-rex', 'Falcon', 'Halcon', 'Condor', 'Eagle', 'Hawk', 'Sparrow']); // Nombre del avión
-            $table->string('code')->unique()->regex('/^\d{3}[A-Z]$/') ;// Código único del avión
-            $table->integer('capacity'); // Capacidad total de asientos
-            $table->json('seat_classes'); // Campo enum
-            $table->json('seat_codes'); // Códigos de asientos
-            $table->timestamps(); // created_at y updated_at
+            $table->id(); // ID único como clave primaria
+            $table->string('name'); // Nombre del avión con el código de la serie (ejemplo: Airbus-747)
+            $table->integer('capacity'); // Capacidad total de asientos del avión
+            $table->json('seats'); // Distribución de los asientos en JSON
+            $table->enum('status', ['borrador', 'en espera', 'completo', 'en trayecto']); // Estado del avión
+            $table->timestamps();
         });
     }
-
     /**
      * Reverse the migrations.
      */

@@ -9,16 +9,35 @@ class Aircraft extends Model
 {
     use HasFactory;
 
-    protected $table = 'aircrafts'; // Asegúrate de que sea 'aircrafts' (en plural)
 
-    protected $fillable = ['name', 'code', 'capacity', 'seat_classes', 'seat_codes'];
+     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'aircrafts';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = ['name', 'capacity', 'seats', 'status'];
+
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
     protected $casts = [
-        'seat_classes' => 'array',
-        'seat_codes' => 'array',
+        'seats' => 'array',  // Convertir la distribución de los asientos desde JSON a un array
     ];
 
-    // Relación con vuelos
+    /**
+     * Relación con vuelos.
+     * Un avión puede tener muchos vuelos asociados.
+     */
     public function flights()
     {
         return $this->hasMany(Flight::class);
