@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Datatables;
 
 use App\Models\User;
@@ -7,13 +8,13 @@ use Illuminate\Support\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 
 
-class UserDatatable
+class UsersDatatable
 {
     /**
      * Obtener los datos de los usuarios para DataTables.
      */
 
-public function getUserData(Request $request)
+    public function getUserData(Request $request)
     {
         if ($request->ajax()) {
             // Crear la consulta base para los usuarios
@@ -70,19 +71,12 @@ public function getUserData(Request $request)
                                         <img src="' . asset('icons/edit.png') . '" alt="edit">
                                     </a>';
 
-                    // Botón de ver historial
-                    // $showButton = '<a href="' . route('tickets.getTickets', ['id' => $user->id]) . '" class="btn btn-sm btn-info mx-2">
-                    //                     <img src="' . asset('icons/history-tickets.png') . '" alt="view">
-                    //                 </a>';
-
                     // Botón de eliminación con Alpine.js
                     $deleteButton = '<button class="btn btn-sm btn-danger"
                     x-data="{}"
                     x-on:click.prevent="$dispatch(\'user-deletion\', { userId: ' . $user->id . ' })">
                     <img src="' . asset('icons/delete.png') . '" alt="delete">
-                </button>';
-
-
+                    </button>';
 
                     // Envolver los botones en un contenedor con clases de Tailwind para alinear en fila
                     return '<div id="action-btn" class="flex gap-3">' . $editButton  . $deleteButton .  '</div>';

@@ -8,21 +8,19 @@ use Illuminate\Support\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 
 
-class TicketDatatable
+class TicketsDatatable
 {
     public function getTicketsData(Request $request)
     {
         if ($request->ajax()) {
-            // Asegúrate de cargar las relaciones correctamente
+
             $query = Ticket::with([
                 'user:id,name,lastname',
                 'flight:id,code,origin,destination,duration',
-                'flight.aircraft:id,seats' // Asegúrate de cargar el avión con el código de asiento
+                'flight.aircraft:id,seats'
             ]);
 
             //devolver todos los datos formateados para DataTables
-            
-
 
             return DataTables::of($query)
                 ->addColumn('full_name', function ($ticket) {
@@ -52,18 +50,19 @@ class TicketDatatable
                     // Verificar si la relación 'flight' existe antes de acceder a 'duration'
                     return $ticket->flight ? $ticket->flight->duration : 'N/A';
                 })
-                ->addColumn('seats', function ($ticket) {
-                    // Verificar si la relación 'flight' y 'aircraft' existen antes de acceder a 'seats_codes'
-                    return ($ticket->flight && $ticket->flight->aircraft)
-                        ? implode(", ", $ticket->flight->aircraft->seats)
-                        : 'N/A';
-                })
                 ->addColumn('purchase_date', function ($ticket) {
                     return $ticket->purchase_date ? $ticket->purchase_date->format('d/m/Y') : 'N/A';
                 })
                 ->addColumn('action', function ($ticket) {
-                    return '<a href="#" class="btn btn-primary">Editar</a>';
+                    return '<a href="' . route('user-tickets', ['userId' => $ticket->user->id]) . '" class="btn btn-sm btn-info mx-2">
+                                <img src="' . asset('icons/history-tickets.png') . '" alt="view">
+                            </a>';
                 })
+
+
+
+
+
                 ->rawColumns(['action'])
                 ->make(true);
         }

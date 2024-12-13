@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
-class FlightDatatable
+class FlightsDatatable
 {
 
 
@@ -28,6 +28,31 @@ class FlightDatatable
                 });
             }
 
+            // Filtros
+            if ($request->filled('origin')) {
+                $query->where('origin', $request->origin);
+            }
+            if ($request->filled('destination')) {
+                $query->where('destination', $request->destination);
+            }
+            if ($request->filled('seats')) {
+                // Filtrar por número de asientos, accediendo a la relación aircraft
+                $query->whereHas('aircraft', function ($q) use ($request) {
+                    $q->where('seats', $request->seats);
+                });
+            }
+            if ($request->filled('price')) {
+                // Filtrar por precio de los tickets
+                $query->whereHas('tickets', function ($q) use ($request) {
+                    $q->where('price', '<=', $request->price);
+                });
+            }
+            if ($request->filled('departure_date_from')) {
+                $query->whereDate('departure_date', '>=', $request->departure_date_from);
+            }
+            if ($request->filled('departure_date_to')) {
+                $query->whereDate('departure_date', '<=', $request->departure_date_to);
+            }
             // Devuelve datos formateados para DataTables
             return DataTables::of($query)
                 ->addColumn('image', function ($flight) {
@@ -42,14 +67,22 @@ class FlightDatatable
                     return $flight->aircraft->name ?? 'N/A'; // Mostrar el nombre del avión o "N/A" si no hay avión
                 })
                 ->addColumn('price', function ($flight) {
-                    // Mostrar el precio del primer ticket en formato de euros
-                    $price = $flight->tickets->isNotEmpty()
-                        ? $flight->tickets->first()->price
-                        : 0;
-                    return $price % 1 == 0
-                        ? number_format($price, 0, ',', '.') . '€' // Sin decimales si es un número entero
-                        : number_format($price, 2, ',', '.') . '€'; // Con decimales si es un número flotante
+                    // Decodificar el JSON de los asientos
+                    $seats = json_decode($flight->aircraft->seats, true);
+
+                    // Verificar si la clase turista está definida
+                    if (isset($seats['turista'])) {
+                        // Precio fijo definido para clase turista
+                        $touristPrice = 50.00;
+
+                        return 'Desde ' . (floor($touristPrice) == $touristPrice
+                            ? number_format($touristPrice, 0, ',', '.') // Si el precio es entero, no mostrar decimales
+                            : number_format($touristPrice, 2, ',', '.')) . '€'; // Si el precio tiene decimales, mostrar 2 decimales
+                    }
+
+                    return 'N/A';
                 })
+
                 ->addColumn('seats', function ($flight) {
                     // Decodificar el JSON para obtener un array
                     $seats = json_decode($flight->aircraft->seats, true);

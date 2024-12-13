@@ -13,32 +13,34 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->hasRole('admin')) {
-            // Para el admin: últimos 4 billetes vendidos
+        if ($user && $user->hasRole('admin')) {
+            // Lógica para el administrador
             $lastTickets = Ticket::latest()->take(4)->get();
 
-            // Últimos 4 vuelos con menos plazas libres
-            $flightsWithSeats = Flight::with('aircraft') // Asegúrate de que la relación 'aircraft' esté definida
+            $flightsWithVacancies = Flight::with('aircraft')
                 ->get()
                 ->map(function ($flight) {
-                    // Calculamos la cantidad de plazas libres
-                    $seatsSold = $flight->tickets->count(); // Contamos cuántos tickets se han vendido
-                    $availableSeats = $flight->aircraft->capacity - $seatsSold; // Restamos los billetes vendidos de la capacidad del avión
-                    $flight->available_seats = $availableSeats; // Agregamos un atributo con las plazas libres
+                    $occupiedSeats = $flight->tickets()->count();
+                    $totalSeats = $flight->aircraft->capacity;
+                    $freeSeats = $totalSeats - $occupiedSeats;
+
+                    $flight->free_percentage = $totalSeats > 0 ? round(($freeSeats / $totalSeats) * 100) : 0;
+
                     return $flight;
                 })
-                ->sortBy('available_seats') // Ordenamos por las plazas libres
-                ->take(4); // Tomamos los primeros 4 vuelos con menos plazas libres
+                ->sortByDesc('free_percentage')
+                ->take(4);
 
-            return view('dashboard', compact('lastTickets', 'flightsWithSeats'));
-        } else {
-            // Para el cliente: últimos 4 billetes comprados
+            return view('dashboard', compact('lastTickets', 'flightsWithVacancies'));
+        } elseif ($user && $user->hasRole('client')) {
+            // Lógica para el cliente
             $lastTickets = Ticket::where('user_id', $user->id)->latest()->take(4)->get();
-
-            // Últimos 4 vuelos más recientes
             $latestFlights = Flight::latest()->take(4)->get();
 
             return view('dashboard', compact('lastTickets', 'latestFlights'));
         }
+
+        // Si no hay un usuario autenticado, redirigir al login
+        return redirect()->route('home');
     }
 }

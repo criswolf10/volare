@@ -20,27 +20,27 @@
             <div class="mb-3 xl:w-[50%]">
                 <x-input-label for="name" :value="__('Name')" />
                 <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)"
-                    required autofocus autocomplete="given-name" />
+                    autofocus autocomplete="given-name" />
                 <x-input-error class="mt-2" :messages="$errors->get('name')" />
             </div>
 
             <div class="mb-3 xl:w-[50%]">
                 <x-input-label for="lastname" :value="__('Lastname')" />
                 <x-text-input id="lastname" name="lastname" type="text" class="mt-1 block w-full" :value="old('lastname', $user->lastname)"
-                    required autofocus autocomplete="family-name" />
+                    autofocus autocomplete="family-name" />
                 <x-input-error class="mt-2" :messages="$errors->get('lastname')" />
             </div>
             <div class="mb-3 xl:w-[50%]">
                 <x-input-label for="phone" :value="__('Phone')" />
                 <x-text-input id="phone" name="phone" type="tel" class="mt-1 block w-full" :value="old('phone', $user->phone)"
-                    required autofocus autocomplete="tel" pattern="\d{9}" maxlength="9" inputmode="numeric" />
+                    autofocus autocomplete="tel" inputmode="numeric" />
                 <x-input-error class="mt-2" :messages="$errors->get('phone')" />
             </div>
 
             <div class="mb-3 xl:w-[50%]">
                 <x-input-label for="email" :value="__('Email')" />
                 <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)"
-                    required autocomplete="email" />
+                    autocomplete="email" />
                 <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
                 @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$user->hasVerifiedEmail())
@@ -111,25 +111,6 @@
 
 {{-- Sección de Eliminación --}}
 <section class="space-y-6 mt-5">
-    {{-- Modal de Éxito --}}
-    @if (session('success'))
-        <x-modal name="user-delete-modal" show="true">
-            <!-- Mensaje de éxito -->
-            <div class="text-center py-8">
-                <h3 class="text-xl font-semibold text-green-600">¡Usuario eliminado correctamente!</h3>
-                <p class="mt-2 text-gray-600">Pulse en aceptar para volver a gestión de usuarios</p>
-            </div>
-
-            <!-- Botón de acción -->
-            <div class="flex justify-around mb-6">
-                <a href="{{ route('users') }}"
-                    class="px-4 py-2 bg-[#22B3B2] hover:bg-opacity-75 text-white rounded-lg">
-                    Aceptar
-                </a>
-            </div>
-        </x-modal>
-    @endif
-
 
     <div class="flex flex-col justify-start bg-white shadow-lg rounded-lg p-5 gap-2" x-data="{ modalOpen: false }">
         <h2 class="text-lg xl:text-2xl font-medium text-gray-900">

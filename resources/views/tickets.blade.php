@@ -23,7 +23,7 @@
 
         <!-- Tabla de usuarios -->
         <div class=" overflow-x-auto w-full p-3">
-            <table class="table table-bordered justify-center items-center" id="tickets-table">
+            <table class="table border-collapse justify-center items-center" id="tickets-table">
                 <thead class="bg-[#22B3B2] text-white uppercase ">
                     <tr>
                         <th>Usuario</th>
@@ -59,7 +59,7 @@
                     serverSide: true,
                     orderable: false,
                     ajax: {
-                        url: '{{ route('tickets.ticketDatatable') }}',
+                        url: '{{ route('tickets.ticketsDatatable') }}',
                         data: function(d) {
                             // Adjuntar filtros
                             const formData = $('#filter-form').serializeArray();
@@ -104,8 +104,8 @@
                             orderable: false
                         },
                         {
-                            data: 'seats',
-                            name: 'seats',
+                            data: 'seat',
+                            name: 'seat',
                             orderable: false
                         },
                         {

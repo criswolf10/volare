@@ -3,6 +3,23 @@
     @section('title-page', 'Listado de usuarios')
 
     @section('content')
+        {{-- Modal de Éxito --}}
+        @if (session('success'))
+            <x-modal name="user-delete-modal" show="true">
+                <!-- Mensaje de éxito -->
+                <div class="text-center py-8">
+                    <h3 class="text-xl font-semibold text-green-600">¡Usuario eliminado correctamente!</h3>
+                    <p class="mt-2 text-gray-600">Pulse en aceptar para volver a gestión de usuarios</p>
+                </div>
+
+                <!-- Botón de acción -->
+                <div class="flex justify-around mb-6">
+                    <a href="{{ route('users') }}" class="px-4 py-2 bg-[#22B3B2] hover:bg-opacity-75 text-white rounded-lg">
+                        Aceptar
+                    </a>
+                </div>
+            </x-modal>
+        @endif
         <div class=" p-5 h-full w-full">
             <div class="flex justify-center items-center w-full mb-6 p-3">
 
@@ -32,7 +49,7 @@
             <!-- Tabla de usuarios -->
             <div class=" overflow-x-auto w-full p-3">
                 <table class="table table-bordered justify-center items-center" id="users-table">
-                    <thead class="bg-[#22B3B2] text-white uppercase ">
+                    <thead class="bg-[#22B3B2] text-white uppercase">
                         <tr>
                             <th>Usuario</th>
                             <th>Rol</th>
@@ -132,7 +149,7 @@
                         serverSide: true,
                         orderable: false,
                         ajax: {
-                            url: '{{ route('users.userDatatable') }}',
+                            url: '{{ route('users.usersDatatable') }}',
                             data: function(d) {
                                 // Adjuntar filtros
                                 const formData = $('#filter-form').serializeArray();
@@ -177,9 +194,6 @@
                                 previous: "<", // Reemplaza "Anterior" con "<"
                                 next: ">" // Reemplaza "Siguiente" con ">"
                             },
-
-
-
                         },
                         lengthChange: true, // Desactiva la paginación
                         pageLength: 10,

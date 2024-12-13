@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\FlightRequest;
+use App\Http\Requests\UserDeleteRequest;
 use App\Http\Requests\UserRequest;
+use App\Mail\FlightCancelled;
 use App\Models\Flight;
 use App\Models\Aircraft;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -62,7 +65,11 @@ class FlightController extends Controller
     {
         $aircrafts = Aircraft::all(); // Obtener aviones disponibles para editar la relación
         $flight = Flight::findOrFail($id); // Buscar el vuelo por ID
-        return view('admin.edit-flights', compact('flight', 'aircrafts'));
+
+        // Obtener todos los precios de los tickets
+        $ticketPrice = $flight->tickets()->pluck('price');
+
+        return view('admin.edit-flights', compact('flight', 'aircrafts', 'ticketPrice'));
     }
 
 
@@ -92,27 +99,41 @@ class FlightController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(UserRequest $request , $id)
+    public function destroy(UserDeleteRequest $request, $id)
     {
-        //Validar contraseña del usuario para la eliminacion
-        $request->validate([
-            'password' => 'required|string',
-        ]);
-
-        //Obtener el usuario administrador autenticado
+        // Obtener el usuario administrador autenticado
         $adminUser = Auth::user();
 
-        //Verificar si la contraseña del usuario autenticado es correcta
-        // Verificar que la contraseña es correcta
-        if (!Hash::check($request->password, $adminUser->password)) {
-            return redirect()
-                ->back()
-                ->withErrors(['password' => 'La contraseña ingresada no es correcta.'])
-                ->withInput();
-        }
+        // Verificar que la contraseña del administrador es correcta
+        $request->validate([
+            'password' => ['required', function ($attribute, $value, $fail) use ($adminUser) {
+                if (!Hash::check($value, $adminUser->password)) {
+                    return $fail('La contraseña ingresada no es correcta.');
+                }
+            }],
+        ]);
 
         // Buscar el vuelo por ID
         $flight = Flight::findOrFail($id);
+
+        // Verificar el estado del avión asignado al vuelo
+        if (!$flight->aircraft || !in_array($flight->aircraft->status, ['en espera', 'borrador', 'completo'])) {
+            return redirect()->back()
+                ->with('error', 'El vuelo no puede ser eliminado porque el avión asignado está en trayecto.');
+        }
+
+        // Enviar correos a los usuarios relacionados con el vuelo (solo si hay un usuario)
+        foreach ($flight->tickets as $ticket) {
+            $user = $ticket->user; // Obtener el usuario relacionado con el ticket
+
+            // Verificar que el ticket tiene un usuario asociado
+            if ($user) {
+                Mail::to($user->email)->send(new FlightCancelled($flight));
+            }
+        }
+
+        // Eliminar los tickets asociados al vuelo
+        $flight->tickets()->delete();
 
         // Eliminar el vuelo
         $flight->delete();
@@ -120,6 +141,36 @@ class FlightController extends Controller
         // Redirigir con mensaje de éxito
         return redirect()
             ->route('flights')
-            ->with('success', 'Vuelo eliminado exitosamente.');
+            ->with('success');
+    }
+
+
+
+
+    public function dashboard()
+    {
+        $user = auth()->user();
+
+
+
+        // Datos para clientes: Últimos vuelos recientes
+        $latestFlights = Flight::latest()->take(5)->get();
+
+        // Datos para administradores: Vuelos con más plazas vacantes
+        $flightsWithVacancies = Flight::withCount(['tickets as seats_taken' => function ($query) {
+            $query->where('status', 'confirmed');
+        }])
+            ->get()
+            ->map(function ($flight) {
+                $flight->seats_free = $flight->capacity - $flight->seats_taken;
+                $flight->free_percentage = $flight->capacity > 0
+                    ? round(($flight->seats_free / $flight->capacity) * 100)
+                    : 0;
+                return $flight;
+            })
+            ->sortByDesc('seats_free')
+            ->take(5);
+
+        return view('dashboard', compact('latestFlights', 'flightsWithVacancies'));
     }
 }

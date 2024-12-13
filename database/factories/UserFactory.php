@@ -34,29 +34,9 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'phone' => $this->generateFormattedPhoneNumber(),  // Usar la función para formatear el teléfono
+            'phone' => fake()->numerify('#########'),
             'remember_token' => Str::random(10),
         ];
-    }
-
-    /**
-     * Función para generar el número de teléfono formateado.
-     *
-     * @return string
-     */
-    protected function generateFormattedPhoneNumber(): string
-    {
-        // Generar un número de teléfono aleatorio
-        $phone = fake()->phoneNumber();
-
-        // Eliminar cualquier caracter no numérico
-        $phone = preg_replace('/\D/', '', $phone);
-
-        // Asegurarse de que el teléfono tenga al menos 9 dígitos
-        $phone = substr($phone, 0, 9);
-
-        // Formatear el teléfono en el formato 'xxx xxx xxx'
-        return substr($phone, 0, 3) . ' ' . substr($phone, 3, 3) . ' ' . substr($phone, 6, 3);
     }
 
     /**

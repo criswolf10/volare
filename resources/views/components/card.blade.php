@@ -11,9 +11,6 @@
             <img src="{{ asset($image) }}" alt="{{ $title }}" class="w-full h-48 object-cover rounded-lg">
         </div>
 
-        <!-- Descripción y Botón -->
-
-
             <x-tertiary-button class=" w-full">
                 <a href="{{ auth()->check() ? route('flights') : route('login') }}">
                     {{ __('Reservar') }}

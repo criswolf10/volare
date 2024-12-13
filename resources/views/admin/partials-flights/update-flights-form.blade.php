@@ -8,9 +8,19 @@
             {{ __('Update the flight data') }}
         </p>
 
-        <form  method="post" action="{{ route('flights.update', $flight->id) }}" >
+        <form method="post" action="{{ route('flights.update', $flight->id) }}">
             @csrf
             @method('patch')
+
+            <div class="mb-3 xl:w-[50%]">
+                <x-input-label for="aircraft" :value="__('Aircraft')" />
+                <x-select id="aircraft" name="aircraft" class="mt-1 block w-full">
+                    <option value="">{{ __('Select an aircraft') }}</option>
+                    @foreach ($aircrafts as $aircraft)
+                        <option value="{{ $aircraft->id }}" @if ($aircraft->id == old('aircraft', $flight->aircraft_id)) selected @endif>
+                            {{ $aircraft->model }}
+                        </option>
+                    @endforeach
 
             <div class="mb-3 xl:w-[50%]">
                 <x-input-label for="code" :value="__('Code')" />
@@ -19,16 +29,9 @@
             </div>
 
             <div class="mb-3 xl:w-[50%]">
-                <x-input-label for="departure" :value="__('Departure')" />
-                <x-text-input id="departure" name="departure" type="text" class="mt-1 block w-full" />
-                <x-input-error class="mt-2" :messages="$errors->get('departure')" />
-            </div>
-
-            <div class="mb-3 xl:w-[50%]">
-                <x-input-label for="arrival" :value="__('Arrival')" />
-                <x-text-input id="arrival" name="arrival" type="text" class="mt-1 block
-                    w-full" />
-                <x-input-error class="mt-2" :messages="$errors->get('arrival')" />
+                <x-input-label for="departure_date" :value="__('Departure_date')" />
+                <x-text-input id="departure_date" name="departure" type="text" class="mt-1 block w-full" />
+                <x-input-error class="mt-2" :messages="$errors->get('departure_date')" />
             </div>
 
             <div class="mb-3 xl:w-[50%]">
@@ -39,24 +42,30 @@
 
             <div class="mb-3 xl:w-[50%]">
                 <x-input-label for="arrival_time" :value="__('Arrival Time')" />
-                <x-text-input id="arrival_time" name="arrival_time" type="text" class="mt-1 block w-full" />
+                <x-text-input id="arrival_time" name="arrival_time" type="text" class="mt-1 block w-full" value="{{ old('arrival_time', $flight)}}" />
                 <x-input-error class="mt-2" :messages="$errors->get('arrival_time')" />
             </div>
 
             <div class="mb-3 xl:w-[50%]">
                 <x-input-label for="price" :value="__('Price')" />
-                <x-text-input id="price" name="price" type="text" class="mt-1 block
-
-                    w-full" />
+                <x-text-input id="price" name="price" type="text" class="mt-1 block w-full" value="{{ old('price', $ticketPrice) }}" />
                 <x-input-error class="mt-2" :messages="$errors->get('price')" />
             </div>
+
 
             <div class="mb-3 xl:w-[50%]">
                 <x-input-label for="seats" :value="__('Seats')" />
                 <x-text-input id="seats" name="seats" type="text" class="mt-1 block w-full" />
                 <x-input-error class="mt-2" :messages="$errors->get('seats')" />
             </div>
-            
+
+            <div class="flex justify-center items-center gap-4 mb-3 xl:w-[50%]">
+                <x-tertiary-button>{{ __('Save') }}</x-tertiary-button>
+
+                <x-danger-button>
+                    <a href="{{ route('users') }}">{{ __('Cancelar') }}</a>
+                </x-danger-button>
+            </div>
 
 </section>
 

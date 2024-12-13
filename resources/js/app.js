@@ -32,8 +32,7 @@ menuToggle.addEventListener("click", () => {
 });
 
 
-// Variables para el slider, diapositivas y controles
-
+// Variables para el Slider de la página de inicio
 document.addEventListener('DOMContentLoaded', () => {
     const slider = document.querySelector('[data-slider]');
     const slides = slider.children;
@@ -49,19 +48,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalSlides = slides.length;
         const offset = -(currentIndex * 100); // Desplaza el slider al slide actual
         slider.style.transform = `translateX(${offset}%)`;
+    };
 
-        // Reinicia el índice si llega al final
-        if (currentIndex >= totalSlides - 1) {
-            currentIndex = 0;
-        } else {
-            currentIndex++;
-        }
+    const nextSlide = () => {
+        currentIndex = (currentIndex + 1) % slides.length; // Incrementa el índice cíclicamente
+        updateSlider();
     };
 
     const startAutoSlide = () => {
-        autoSlide = setInterval(() => {
-            updateSlider();
-        }, intervalTime);
+        autoSlide = setInterval(nextSlide, intervalTime); // Usa `nextSlide` para avanzar automáticamente
     };
 
     const stopAutoSlide = () => {
@@ -79,8 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Botón "Siguiente"
     nextButton.addEventListener('click', () => {
         stopAutoSlide();
-        currentIndex = (currentIndex + 1) % slides.length;
-        updateSlider();
+        nextSlide();
         startAutoSlide();
     });
 

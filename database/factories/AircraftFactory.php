@@ -66,4 +66,5 @@ class AircraftFactory extends Factory
 
         return $distribution;
     }
+
 }
