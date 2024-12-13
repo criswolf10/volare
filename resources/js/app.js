@@ -81,3 +81,47 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicia el slider automático
     startAutoSlide();
 });
+
+
+// Variables para el campo de duración de vuelo del formulario de edicion de vuelos
+
+document.addEventListener('DOMContentLoaded', () => {
+    const departureInput = document.getElementById('departure_time');
+    const arrivalInput = document.getElementById('arrival_time');
+    const durationInput = document.getElementById('duration');
+
+    function calculateDuration() {
+        const departureTime = departureInput.value;
+        const arrivalTime = arrivalInput.value;
+
+        if (departureTime && arrivalTime) {
+            const [depHours, depMinutes] = departureTime.split(':').map(Number);
+            const [arrHours, arrMinutes] = arrivalTime.split(':').map(Number);
+
+            const departure = new Date(0, 0, 0, depHours, depMinutes);
+            const arrival = new Date(0, 0, 0, arrHours, arrMinutes);
+
+            const diffMs = arrival - departure;
+            if (diffMs >= 0) {
+                const diffMinutes = diffMs / 1000 / 60;
+                const hours = Math.floor(diffMinutes / 60);
+                const minutes = diffMinutes % 60;
+
+                let formattedDuration = '';
+                if (hours > 0) {
+                    formattedDuration += `${hours} hora${hours > 1 ? 's' : ''}`;
+                }
+                if (minutes > 0) {
+                    formattedDuration += `${hours > 0 ? ' y ' : ''}${minutes} minuto${minutes > 1 ? 's' : ''}`;
+                }
+
+                durationInput.value = formattedDuration;
+            } else {
+                durationInput.value = 'Duración inválida';
+            }
+        }
+    }
+
+    departureInput.addEventListener('input', calculateDuration);
+    arrivalInput.addEventListener('input', calculateDuration);
+});

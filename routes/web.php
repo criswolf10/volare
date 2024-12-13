@@ -67,8 +67,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/data', [UsersDatatable::class, 'getUserData'])->name('users.usersDatatable');
     Route::get('/admin/create-users', [UserController::class, 'create'])->name('create-users');
     Route::patch('/admin/create-users', [UserController::class, 'store'])->name('user-create');
-    Route::patch('/admin/edit-users/{id}', [UserController::class, 'update'])->name('user-update');
     Route::get('/admin/edit-users/{id}', [UserController::class, 'edit'])->name('edit-users');
+    Route::patch('/admin/edit-users/{id}', [UserController::class, 'update'])->name('user-update');
+
 
     Route::delete('/admin/edit-users/{id}', [UserController::class, 'destroy'])->name('user-delete');
 });

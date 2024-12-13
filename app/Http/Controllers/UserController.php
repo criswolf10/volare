@@ -22,10 +22,40 @@ class UserController extends Controller
 
         $user = Auth::user();
         if ($user->hasRole('admin')) {
-            return view('users');
+            return view('users', compact('user'));
         } else {
             return redirect()->route('profile.edit');
         }
+    }
+
+
+    // Crear un nuevo usuario
+
+    public function create()
+    {
+        return view('admin.create-users');
+    }
+
+    public function store(UserRequest $userRequest)
+    {
+
+        $user = new User();
+        $user->name = $userRequest->name;
+        $user->lastname = $userRequest->lastname;
+        $user->email = $userRequest->email;
+        $user->password = bcrypt($userRequest->password);
+        $user->phone = $userRequest->phone;
+        $user->save();
+
+
+        // Asignar el rol al usuario
+        $role = $userRequest->input('role');
+        if ($role) {
+            $user->assignRole($role);
+        }
+
+        // Redirigir con el modal mostrando el éxito
+        return redirect()->route('create-users')->with('success', 'Usuario creado con éxito.');
     }
 
     public function edit($id)
@@ -34,41 +64,14 @@ class UserController extends Controller
         return view('admin.edit-users', compact('user'));
     }
 
-    // Crear un nuevo usuario
 
-    public function create(UserRequest $userRequest,$id)
-    {
-        return view('admin.create-users')   ;
-    }
-
-    public function store(UserRequest $userRequest)
-{
-
-    $user = new User();
-    $user->name = $userRequest->name;
-    $user->lastname = $userRequest->lastname;
-    $user->email = $userRequest->email;
-    $user->password = bcrypt($userRequest->password);
-    $user->phone = $userRequest->phone;
-    $user->save();
-
-
-    // Asignar el rol al usuario
-    $role = $userRequest->input('role');
-    if ($role) {
-        $user->assignRole($role);
-    }
-
-    // Redirigir con el modal mostrando el éxito
-    return redirect()->route('create-users')->with('success', 'Usuario creado con éxito.');
-}
 
     // Actualizar un usuario
-    public function update(UserUpdateRequest $userRequest): RedirectResponse
+    public function update(UserUpdateRequest $userRequest, $id)
     {
 
         // Busca el usuario con el ID proporcionado
-        $user = User::findOrFail($userRequest->route('id'));
+        $user = User::findOrFail($id);
 
         // Actualiza solo los campos válidos
         $user->fill($userRequest->validated());
@@ -91,8 +94,12 @@ class UserController extends Controller
 
         // Guarda los cambios
         $user->save();
-        dd($user->id, route('edit-users', ['id' => $user->id]));
-        return redirect()->route('edit-users', ['id' => $user->id])->with('success', 'User updated successfully');
+
+        return redirect()->route('users')
+        ->with('success_updated', 'User updated successfully')
+        ->with('last_updated_user_id', $user->id)
+        ->with('last_updated_user_name', $user->name);  // Guardamos el nombre también
+
     }
 
     // Eliminar un usuario
@@ -117,13 +124,13 @@ class UserController extends Controller
         if ($adminUser->id === $user->id) {
             return redirect()
                 ->back()
-                ->withErrors(['password' => 'No puedes eliminar tu propia cuenta.']);
+                ->with('error' , 'No puedes eliminar tu propia cuenta.');
         }
 
         // Eliminar al usuario
         $user->delete();
 
         // Redirigir con el modal de éxito
-        return redirect()->route('users')->with('success', 'Usuario eliminado con éxito.');
+        return redirect()->route('users')->with('success_deletion', 'Usuario eliminado con éxito.');
     }
 }

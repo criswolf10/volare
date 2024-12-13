@@ -12,9 +12,9 @@
             @csrf
         </form>
 
-        <form method="post" action="{{ route('user-update', ['id' => $user->id]) }}" class="mt-4">
+        <form method="POST" action="{{ route('user-update', ['id' => $user->id]) }}" class="mt-4">
             @csrf
-            @method('patch')
+            @method('PATCH')
 
 
             <div class="mb-3 xl:w-[50%]">
@@ -33,7 +33,7 @@
             <div class="mb-3 xl:w-[50%]">
                 <x-input-label for="phone" :value="__('Phone')" />
                 <x-text-input id="phone" name="phone" type="tel" class="mt-1 block w-full" :value="old('phone', $user->phone)"
-                    autofocus autocomplete="tel" inputmode="numeric" />
+                    autofocus autocomplete="tel" inputmode="numeric" maxlength="9" />
                 <x-input-error class="mt-2" :messages="$errors->get('phone')" />
             </div>
 

@@ -3,25 +3,57 @@
     @section('title-page', 'Listado de usuarios')
 
     @section('content')
+        @if (session('success_updated'))
+            <x-modal show="true" name="user-update-modal">
+                <!-- Mensaje de éxito -->
+                <div class="text-center py-8">
+                    <h3 class="text-xl font-semibold text-green-600">¡El usuario {{ session('last_updated_user_name') }} ha
+                        sido actualizado correctamente!</h3>
+                    <p class="mt-2 text-gray-600"> ¿Qué deseas hacer ahora?</p>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex justify-around mb-6">
+                    <a href="{{ route('edit-users', ['id' => session('last_updated_user_id')]) }}"
+                        class="px-4 py-2 hover:bg-gray-500 text-white rounded-lg bg-gray-600">Olvidé modificar algún dato</a>
+                    <a href="{{ route('users') }}"
+                        class="px-4 py-2 bg-[#22B3B2] hover:bg-opacity-75 text-white rounded-lg">Volver al listado</a>
+                </div>
+            </x-modal>
+        @endif
+
         {{-- Modal de Éxito --}}
-        @if (session('success'))
+        @if (session('success_deletion'))
             <x-modal name="user-delete-modal" show="true">
                 <!-- Mensaje de éxito -->
                 <div class="text-center py-8">
                     <h3 class="text-xl font-semibold text-green-600">¡Usuario eliminado correctamente!</h3>
-                    <p class="mt-2 text-gray-600">Pulse en aceptar para volver a gestión de usuarios</p>
                 </div>
 
                 <!-- Botón de acción -->
                 <div class="flex justify-around mb-6">
                     <a href="{{ route('users') }}" class="px-4 py-2 bg-[#22B3B2] hover:bg-opacity-75 text-white rounded-lg">
-                        Aceptar
+                        Volver al listado
                     </a>
                 </div>
             </x-modal>
         @endif
+         {{-- Modal de Error: No puedes eliminarte a ti mismo --}}
+         @if (session('error'))
+         <x-modal name="user-delete-error" show="true">
+             <div class="text-center py-8">
+                 <h3 class="text-xl font-semibold text-red-600">No se puedes eliminarte a ti mismo</h3>
+                 <p class="mt-2 text-gray-600">{{ session('error') }}</p>
+             </div>
+             <div class="flex justify-around mb-6">
+                 <a href="{{ route('users') }}"
+                     class="px-4 py-2 bg-[#f44336] hover:bg-opacity-75 text-white rounded-lg">Aceptar</a>
+             </div>
+         </x-modal>
+     @endif
+
         <div class=" p-5 h-full w-full">
-            <div class="flex justify-center items-center w-full mb-6 p-3">
+            <div class="flex justify-center items-center w-full mb-5 p-3">
 
                 <!-- Contenedor de los botones de filtro y añadir usuario -->
                 <div class="flex justify-start items-center w-[50%] gap-5">
@@ -48,7 +80,7 @@
 
             <!-- Tabla de usuarios -->
             <div class=" overflow-x-auto w-full p-3">
-                <table class="table table-bordered justify-center items-center" id="users-table">
+                <table class="table border-collapse justify-center items-center" id="users-table">
                     <thead class="bg-[#22B3B2] text-white uppercase">
                         <tr>
                             <th>Usuario</th>
@@ -63,7 +95,7 @@
             </div>
 
             <!--Agregamos los contenedores para la paginación y mostrar registros -->
-            <div id="custom-page-option" class="flex justify-end items-center w-full h-10 gap-5 my-8">
+            <div id="custom-page-option" class="flex justify-end items-center w-full h-10 gap-5 my-2">
                 <div id="lengthpage-option"></div>
                 <div id="paginate-option"></div>
             </div>

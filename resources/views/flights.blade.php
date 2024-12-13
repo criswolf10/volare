@@ -7,7 +7,7 @@
 
     @section('content')
         {{-- Modal de Éxito --}}
-        @if (session('success'))
+        @if (session('success_cancelled'))
             <x-modal name="flight-delete-modal" show="true">
                 <!-- Mensaje de éxito -->
                 <div class="text-center py-8">
@@ -70,7 +70,7 @@
 
 
             <div class=" overflow-x-auto w-full p-3">
-                <table class="table table-bordered justify-center items-center" id="flights-table">
+                <table class="table border-collapse justify-center items-center" id="flights-table">
                     <thead class="bg-[#22B3B2] text-white uppercase ">
                         <tr>
                             <th></th>

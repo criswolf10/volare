@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\FlightRequest;
 use App\Http\Requests\UserDeleteRequest;
-use App\Http\Requests\UserRequest;
+use App\Http\Requests\FlightUpdateRequest;
 use App\Mail\FlightCancelled;
 use App\Models\Flight;
 use App\Models\Aircraft;
 use Illuminate\Http\Request;
+use App\Models\Ticket;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -61,40 +62,72 @@ class FlightController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
+    // Función para mostrar el formulario de edición
     public function edit($id)
     {
-        $aircrafts = Aircraft::all(); // Obtener aviones disponibles para editar la relación
-        $flight = Flight::findOrFail($id); // Buscar el vuelo por ID
+        // Obtener el vuelo específico con sus tickets relacionados y el avión
+        $flight = Flight::with('tickets', 'aircraft')->findOrFail($id);
 
-        // Obtener todos los precios de los tickets
-        $ticketPrice = $flight->tickets()->pluck('price');
+        // Obtener aviones en estado "borrador" para el select
+        $aircrafts = Aircraft::where('status', 'borrador')->get();
 
-        return view('admin.edit-flights', compact('flight', 'aircrafts', 'ticketPrice'));
+        // Pasar los datos del vuelo y tickets a la vista
+        return view('admin.edit-flights', compact('flight', 'aircrafts'));
     }
+
 
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(FlightRequest $request)
+    // Función para actualizar el vuelo
+    public function update(FlightUpdateRequest $request, $id)
     {
-        // Buscar el vuelo por ID
-        $flight = Flight::findOrFail($request->route('id'));
+        // Obtener el vuelo específico
+        $flight = Flight::findOrFail($id);
 
-        // Actualizar el vuelo con los datos validados
-        $flight->update($request->all());
+        // Actualizar los datos del vuelo
+        $flight->update([
+            'aircraft_id' => $request->input('aircraft_id'),
+            'departure_date' => $request->input('departure_date'),
+            'departure_time' => Carbon::parse($request->input('departure_time'))->format('H:i'),
+            'arrival_time' => Carbon::parse($request->input('arrival_time'))->format('H:i'),
+        ]);
 
-        // Guardar los cambios
+        // Calcular la duración del vuelo
+        $departureTime = Carbon::parse($request->input('departure_time'));
+        $arrivalTime = Carbon::parse($request->input('arrival_time'));
+        $durationInMinutes = $departureTime->diffInMinutes($arrivalTime);
+
+        // Convertir la duración a formato legible
+        $formattedDuration = sprintf(
+            '%d hora%s%s%d minuto%s',
+            floor($durationInMinutes / 60),
+            floor($durationInMinutes / 60) > 1 ? 's' : '',
+            floor($durationInMinutes / 60) && $durationInMinutes % 60 ? ' y ' : '',
+            $durationInMinutes % 60,
+            $durationInMinutes % 60 > 1 ? 's' : ''
+        );
+
+        // Actualizar la duración en el modelo
+        $flight->duration = trim($formattedDuration, ' y ');
+
+        // Actualizar los precios de los tickets
+        foreach (['1ª clase' => 'price_first_class', '2ª clase' => 'price_second_class', 'turista' => 'price_tourist'] as $class => $inputField) {
+            if ($request->has($inputField)) {
+                Ticket::where('flight_id', $flight->id)
+                    ->where('class', $class)
+                    ->update(['price' => $request->input($inputField)]);
+            }
+        }
+
+        // Actualizar los datos del vuelo
         $flight->save();
 
-
-
-        // Redireccionar a la vista de vuelos con un mensaje
-        return redirect()->route('flights')->with('success', '¡Vuelo actualizado correctamente!');
+        // Redirigir con mensaje de éxito
+        return redirect()->route('flights')->with('success', 'Vuelo actualizado correctamente.');
     }
-
-
-
+    
 
     /**
      * Remove the specified resource from storage.
@@ -141,7 +174,7 @@ class FlightController extends Controller
         // Redirigir con mensaje de éxito
         return redirect()
             ->route('flights')
-            ->with('success');
+            ->with('success_cancelled');
     }
 
 
@@ -150,8 +183,6 @@ class FlightController extends Controller
     public function dashboard()
     {
         $user = auth()->user();
-
-
 
         // Datos para clientes: Últimos vuelos recientes
         $latestFlights = Flight::latest()->take(5)->get();

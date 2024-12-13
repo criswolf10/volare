@@ -71,6 +71,7 @@ thead th{
 
 tbody td {
     text-align: start; /* Centrado horizontal */
+    font-size: 0.8rem;
 
 }
 
