@@ -15,9 +15,9 @@ class TicketsDatatable
         if ($request->ajax()) {
 
             $query = Ticket::with([
-                'user:id,name,lastname',
-                'flight:id,code,origin,destination,duration',
-                'flight.aircraft:id,seats'
+                'user:id,name,lastname', // Relación con User
+                'flight:id,code,origin,destination,duration', // Relación con Flight
+                'seat:id,seat_code,class,price' // Relación con AircraftSeat
             ]);
 
             //devolver todos los datos formateados para DataTables
@@ -38,21 +38,21 @@ class TicketsDatatable
                     // Verificar si la relación 'flight' existe antes de acceder a 'destination'
                     return $ticket->flight ? $ticket->flight->destination : 'N/A';
                 })
-
                 ->addColumn('price', function ($ticket) {
-                    return $ticket->price
-                        ? number_format($ticket->price, 0, ',', '.') . '€' // Sin decimales si es un número entero
-                        : number_format($ticket->price, 2, ',', '.') . '€'; // Con decimales si es un número flotante
+                    return $ticket->seat ? '$' . number_format($ticket->seat->price, 2) : 'N/A';
                 })
-
+                ->addColumn('seat_code', function ($ticket) {
+                    return $ticket->seat ? $ticket->seat->seat_code : 'N/A';
+                })
 
                 ->addColumn('duration', function ($ticket) {
                     // Verificar si la relación 'flight' existe antes de acceder a 'duration'
                     return $ticket->flight ? $ticket->flight->duration : 'N/A';
                 })
                 ->addColumn('purchase_date', function ($ticket) {
-                    return $ticket->purchase_date ? $ticket->purchase_date->format('d/m/Y') : 'N/A';
+                    return $ticket->purchase_date ? $ticket->purchase_date->format('d/m/Y H:i:s') : 'N/A';
                 })
+
                 ->addColumn('action', function ($ticket) {
                     return '<a href="' . route('user-tickets', ['userId' => $ticket->user->id]) . '" class="btn btn-sm btn-info mx-2">
                                 <img src="' . asset('icons/history-tickets.png') . '" alt="view">

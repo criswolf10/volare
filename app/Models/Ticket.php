@@ -10,12 +10,11 @@ class Ticket extends Model
     use HasFactory;
 
     /**
-     * The table associated with the model.
+     * La tabla asociada al modelo.
      *
      * @var string
      */
     protected $table = 'tickets';
-
 
     /**
      * Los atributos que se pueden asignar masivamente.
@@ -23,13 +22,13 @@ class Ticket extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id',
+        'user_id', // Esto ahora puede ser null
         'flight_id',
+        'aircraft_seat_id',
         'booking_code',
-        'price',
         'purchase_date',
-        'seat',
         'quantity',
+        'passenger_id',
     ];
 
     /**
@@ -38,19 +37,29 @@ class Ticket extends Model
      * @var array
      */
     protected $casts = [
-        'purchase_date' => 'datetime', // La fecha se convertirá a una instancia de Carbon
-        'seat' => 'array',  // Los asientos se almacenarán como un array
+        'purchase_date' => 'datetime',
     ];
 
     /**
      * Relación con el modelo `User`.
      *
-     * Un ticket pertenece a un usuario.
+     * Un ticket pertenece a un usuario (opcional).
      */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Relación con el modelo `Passenger`.
+     *
+     * Un ticket pertenece a un pasajero.
+     */
+    public function passenger()
+    {
+        return $this->belongsTo(Passenger::class);
+    }
+
 
     /**
      * Relación con el modelo `Flight`.
@@ -62,22 +71,13 @@ class Ticket extends Model
         return $this->belongsTo(Flight::class);
     }
 
-
     /**
-     * Validar que un asiento único no pueda estar asignado dos veces en el mismo vuelo.
+     * Relación con el modelo `AircraftSeat`.
+     *
+     * Un ticket pertenece a un asiento de avión.
      */
-    public static function boot()
+    public function seat()
     {
-        parent::boot();
-
-        static::creating(function ($ticket) {
-            $exists = Ticket::where('flight_id', $ticket->flight_id)
-                ->where('seat', $ticket->seat)
-                ->exists();
-
-            if ($exists) {
-                throw new \Exception("El asiento {$ticket->seat} ya está asignado en el vuelo {$ticket->flight_id}");
-            }
-        });
+        return $this->belongsTo(AircraftSeat::class, 'aircraft_seat_id');
     }
 }

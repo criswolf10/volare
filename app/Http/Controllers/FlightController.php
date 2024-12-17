@@ -33,8 +33,8 @@ class FlightController extends Controller
      */
     public function create()
     {
-        // Puedes incluir datos adicionales si son necesarios, como una lista de aviones disponibles
-        $aircrafts = Aircraft::all(); // Obtener los aviones disponibles
+       // Obtener los aviones disponibles que solo esten en estado "borrador"
+        $aircrafts = Aircraft::where('status', 'borrador')->get();
         return view('admin.create-flights', compact('aircrafts'));
     }
 
@@ -46,6 +46,8 @@ class FlightController extends Controller
     {
         // Crear un nuevo vuelo con los datos validados
         $flight = Flight::create($request->validated());
+
+
 
         // Asignar la imagen por defecto al vuelo
         $defaultImageUrl = 'icons/flights.svg';
@@ -127,7 +129,7 @@ class FlightController extends Controller
         // Redirigir con mensaje de éxito
         return redirect()->route('flights')->with('success', 'Vuelo actualizado correctamente.');
     }
-    
+
 
     /**
      * Remove the specified resource from storage.
@@ -174,7 +176,7 @@ class FlightController extends Controller
         // Redirigir con mensaje de éxito
         return redirect()
             ->route('flights')
-            ->with('success_cancelled');
+            ->with('success_cancelled', 'Vuelo eliminado correctamente.');
     }
 
 

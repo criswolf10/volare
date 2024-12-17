@@ -54,12 +54,12 @@ class UserRequest extends FormRequest
     public function messages(): array
 {
     return [
-        'name.required' => 'The name field is required.',
-        'name.min' => 'The name must be at least 3 characters.',
-        'lastname.required' => 'The lastname field is required.',
-        'email.unique' => 'This email is already in use.',
-        'phone.unique' => 'This phone number is already registered.',
-        'password.confirmed' => 'The passwords do not match.',
+        'name.required' => 'El campo nombre es obligatorio.',
+        'name.min' => 'El nombre debe tener al menos 3 letras.',
+        'lastname.required' => 'El campo apellido es obligatorio.',
+        'email.unique' => 'Este correo ya está registrado.',
+        'phone.unique' => 'Este teléfono ya está registrado.',
+        'password.confirmed' => 'Las contraseñas no coinciden.',
     ];
 }
 

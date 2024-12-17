@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FlightController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AircraftController;
 
 
 Route::get('/', function () {
@@ -45,20 +46,27 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/admin/edit-flights/{id}', [FlightController::class, 'update'])->name('flights.update');
     // Eliminar un vuelo
     Route::delete('/admin/edit-flights/{id}', [FlightController::class, 'destroy'])->name('flights.delete');
+
+    // Formulario para crear un avion
+    Route::get('/admin/create-aircrafts', [AircraftController::class, 'create'])->name('aircrafts.create');
+    // Guardar un avion
+    Route::post('/admin/create-aircrafts', [AircraftController::class, 'store'])->name('aircrafts.store');
 });
 
-Route::get('/purchase-ticket', [TicketController::class, 'create'])->name('tickets.create');
-Route::post('/purchase-ticket', [TicketController::class, 'store'])->name('tickets.purchase');
+
 
 Route::middleware(['auth'])->group(function () {
     // Rutas para el CRUD de tickets
     Route::get('/tickets', [TicketController::class, 'index'])->name('tickets');
     Route::get('/tickets/data', [TicketsDatatable::class, 'getTicketsData'])->name('tickets.ticketsDatatable');
     Route::get('/myticket/data', [LastTicketsUserDatatable::class, 'getLastTicketsUser'])->name('tickets.LastTicketsUserDatatable');
-    Route::get('/tickets/{id}/preview-invoice', [TicketController::class, 'previewInvoice'])->name('tickets.previewInvoice');
-    Route::get('/tickets/{id}/invoice', [TicketController::class, 'downloadInvoice'])->name('tickets.invoice');
     Route::get('/user-tickets', [UserTicketsDatatable::class, 'getUserTickets'])->name('datatables.userTickets');
     Route::get('/user-tickets/{userId}', [TicketController::class, 'showUserTickets'])->name('user-tickets');
+    Route::get('/purchase-ticket/{flightId}', [TicketController::class, 'create'])->name('tickets.purchase');
+    Route::patch('/purchase-ticket/{flightId}', [TicketController::class, 'store'])->name('tickets.processPurchase');
+    Route::delete('/cancel/tickets/{ticketId}', [TicketController::class, 'destroy'])->name('tickets.delete');
+    Route::get('/cancel/tickets/{ticketId}', [TicketController::class, 'cancelTicket'])->name('cancel-ticket');
+    Route::get('/tickets/success/{ticketId}', [TicketController::class, 'purchaseSuccess'])->name('tickets.success');
 });
 
 Route::middleware(['auth'])->group(function () {

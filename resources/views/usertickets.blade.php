@@ -52,6 +52,7 @@
                 <div id="paginate-option"></div>
             </div>
         </div>
+        
 
         @push('scripts')
             <script>
@@ -88,8 +89,8 @@
                                 orderable:false
                             },
                             {
-                                data: 'seat',
-                                name: 'seat',
+                                data: 'seat_code',
+                                name: 'seat_code',
                                 orderable: false
                             },
 

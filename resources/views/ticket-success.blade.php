@@ -21,7 +21,7 @@
                     </div>
 
                     <!-- Detalles del vuelo y pasajero -->
-                    <div class="flex border-t w-full gap-6">
+                    <div class="flex border-t-4 border-teal-400 w-full gap-6">
                         <div class="flex flex-col justify-start items-start w-[30%] mt-5 gap-4 p-3">
                             <!-- Numero de billete -->
                             <div class="flex justify-center items-center gap-3 w-full">
@@ -31,7 +31,7 @@
 
                             <!-- Código de barras o código QR  -->
                             <div class="flex flex-col justify-center items-center p-5 w-full">
-                                {!! $qrCode !!}
+                                {{-- {!! $qrCode !!} --}}
                             </div>
                         </div>
 
@@ -46,8 +46,8 @@
                                 <div class=" flex flex-col justify-center items-center">
                                     <div class="flex justify-start items-center gap-3 w-full mt-4">
                                         <h4 class="text-xl font-bold text-gray-700 uppercase">Pasajero:</h4>
-                                        <p class="text-xl font-semibold text-gray-600">{{ $ticket->user->name }}
-                                            {{ $ticket->user->lastname }}</p>
+                                        <p class="text-xl font-semibold text-gray-600">{{ $ticket->passenger->name }}
+                                            {{ $ticket->passenger->lastname }}</p>
                                     </div>
                                     <div class="flex mt-4 w-full gap-6">
                                         <div>
@@ -59,8 +59,11 @@
                                             <p class="text-xl font-semibold text-gray-600">{{ $ticket->flight->destination }}</p>
                                         </div>
                                         <div>
+                                            <h4 class="text-xl font-bold text-gray-700 uppercase">Zona de asientos</h4>
+                                            <p class="text-center text-xl font-semibold text-gray-600">{{ $ticket->seat->class }}</p>
+                                        <div>
                                             <h4 class="text-xl font-bold text-gray-700 uppercase">Nº Asiento:</h4>
-                                            <p class="text-center text-xl font-semibold text-gray-600">{{ $ticket->seat }}</p>
+                                            <p class="text-center text-xl font-semibold text-gray-600">{{ $ticket->seat->seat_code }}</p>
                                         </div>
 
                                     </div>
@@ -79,18 +82,18 @@
                                         </div>
                                         <div>
                                             <h4 class="text-xl font-bold text-gray-700 uppercase">Precio:</h4>
-                                            <p class="text-xl font-semibold text-gray-600">{{ $ticket->price }}€</p>
+                                            <p class="text-xl font-semibold text-gray-600">{{ $ticket->seat->price }} €</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Botón de descarga (fuera de la vista PDF) -->
+                        {{-- <!-- Botón de descarga (fuera de la vista PDF) -->
                         <div class=" flex justify-center items-center w-[10%] mr-10">
                             <x-tertiary-button>
                                 <a href="{{ route('tickets.invoice', ['id' => $ticket->id]) }}">Descargar</a>
                             </x-tertiary-button>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>

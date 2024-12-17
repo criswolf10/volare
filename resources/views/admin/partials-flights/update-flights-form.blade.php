@@ -33,38 +33,6 @@
             </div>
 
             <!-- Precios por clase de asiento -->
-            <div>
-                <h3>Precios por clase de asiento</h3>
-                @php
-                    $seatPrices = [
-                        '1ª clase' => 150.0,
-                        '2ª clase' => 100.0,
-                        'turista' => 50.0,
-                    ];
-                    // Cargar precios actuales de los tickets asociados
-                    foreach ($seatPrices as $class => $defaultPrice) {
-                        $seatPrices[$class] = $flight->tickets->where('class', $class)->first()->price ?? $defaultPrice;
-                    }
-                @endphp
-
-                <div>
-                    <x-input-label for="price_first_class">Precio 1ª Clase</x-input-label>
-                    <x-text-input type="number" id="price_first_class" name="price_first_class" step="0.01"
-                        value="{{ old('price_first_class', $seatPrices['1ª clase']) }}" readonly class="opacity-50 bg-gray-100 cursor-not-allowed"></x-text-input>
-                </div>
-
-                <div>
-                    <x-input-label for="price_second_class">Precio 2ª Clase</x-input-label>
-                    <x-text-input type="number" id="price_second_class" name="price_second_class" step="0.01"
-                        value="{{ old('price_second_class', $seatPrices['2ª clase']) }}" readonly class="opacity-50 bg-gray-100 cursor-not-allowed"></x-text-input>
-                </div>
-
-                <div>
-                    <x-input-label for="price_tourist">Precio Turista</x-input-label>
-                    <x-text-input type="number" id="price_tourist" name="price_tourist" step="0.01"
-                        value="{{ old('price_tourist', $seatPrices['turista']) }}" readonly class="opacity-50 bg-gray-100 cursor-not-allowed"></x-text-input>
-                </div>
-            </div>
 
 
             <div>
@@ -76,19 +44,8 @@
             <!-- Aircraft Selection -->
             <div>
                 <x-input-label for="aircraft_id" class="block text-sm font-medium text-gray-700">Avión</x-input-label>
-                <select id="aircraft_id" name="aircraft_id"
-                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                    <option value="">Seleccione un avión</option>
-                    @foreach ($aircrafts as $aircraft)
-                        <option value="{{ $aircraft->id }}"
-                            {{ $aircraft->id == $flight->aircraft_id ? 'selected' : '' }}>
-                            {{ $aircraft->name }} ({{ $aircraft->status }})
-                        </option>
-                    @endforeach
-                </select>
-                @error('aircraft_id')
-                    <p class="text-red-500 text-sm">{{ $message }}</p>
-                @enderror
+                <x-text-input type="text" id="aircraft_id" name="aircraft_id" value="{{ $flight->aircraft->name }}" 
+                    readonly class="opacity-50 bg-gray-100 cursor-not-allowed"></x-text-input>
             </div>
 
 

@@ -6,10 +6,10 @@
         <div class="flex flex-col w-full p-5 xl:flex-row gap-5">
             <!-- Sección de "Últimos billetes comprados" y "Últimos vuelos para Cliente" -->
 
-            <section class="overflow-x-auto w-full bg-[#E4F2F2] p-5 shadow-md rounded-lg xl:w-[60%] flex-grow">
+            <section class="overflow-x-auto w-full bg-[#E4F2F2] p-5 shadow-md rounded-lg xl:w-[60%]">
                 <h3 class="text-lg xl:text-3xl mb-6 font-bold">Últimas compras</h3>
-                <table id="lastTicketsTable" class="table justify-center items-center rounded-lg">
-                    <thead class="bg-[#22B3B2] font-bold text-white uppercase">
+                <table id="lastTicketsTable" class="">
+                    <thead class="bg-[#22B3B2] font-bold text-white text-center uppercase">
                         <tr>
                             <th>Usuario</th>
                             <th>Vuelo</th>
@@ -28,24 +28,24 @@
 
             <!-- Sección de "Últimos vuelos más recientes" para Cliente -->
             @role('client')
-                <section class="flex flex-col bg-[#E4F2F2] h-full w-full shadow-md rounded-lg p-5 xl:w-[40%] flex-grow">
+                <section class="flex flex-col bg-[#E4F2F2] h-full w-full shadow-md rounded-lg p-5 xl:w-[35%] flex-grow">
                     <h3 class="text-lg xl:text-3xl mb-6 font-bold">Últimos vuelos</h3>
                     <ul>
                         @forelse ($latestFlights as $flight)
                             <li class="mb-4">
-                                <div class="flex justify-around items-center h-[110px] bg-white p-4 shadow-md rounded-lg">
+                                <div class="flex justify-around items-center bg-white p-2 shadow-md rounded-lg">
                                     <div class="flex flex-col justify-center items-start w-[50%]">
-                                        <div class="text-lg xl:text-2xl font-bold">
+                                        <div class="text-lg  font-bold">
                                         Vuelo {{ $flight->code }}
                                         </div>
-                                        <div class="flex text-sm xl:text-lg text-gray-600">
+                                        <div class="flex text-sm  text-gray-600">
                                             {{ $flight->origin }} → {{ $flight->destination }}
                                         </div>
                                     </div>
                                     <div class="flex justify-end items-end pr-8 w-[50%] text-sm text-gray-600 mt-2">
-                                        <a href="{{ route('tickets.create', ['id' => $flight->id]) }}"
+                                        <a href="{{ route('tickets.purchase', ['flightId' => $flight->id]) }}"
                                             class="btn btn-sm btn-primary">
-                                            <img src="{{ asset('icons/shop.png') }}" alt="buy" class="xl:w-8 xl:h-8">
+                                            <img src="{{ asset('icons/shop.png') }}" alt="buy" >
                                         </a>
                                     </div>
                                 </div>

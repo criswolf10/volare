@@ -104,8 +104,8 @@
                             orderable: false
                         },
                         {
-                            data: 'seat',
-                            name: 'seat',
+                            data: 'seat_code',
+                            name: 'seat_code',
                             orderable: false
                         },
                         {

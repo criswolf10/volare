@@ -10,7 +10,7 @@ class Aircraft extends Model
     use HasFactory;
 
 
-     /**
+    /**
      * The table associated with the model.
      *
      * @var string
@@ -22,17 +22,8 @@ class Aircraft extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'capacity', 'seats', 'status'];
+    protected $fillable = ['name', 'capacity', 'status'];
 
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'seats' => 'array',  // Convertir la distribución de los asientos desde JSON a un array
-    ];
 
     /**
      * Relación con vuelos.
@@ -42,4 +33,14 @@ class Aircraft extends Model
     {
         return $this->hasMany(Flight::class);
     }
+
+    /**
+     * Relación con asientos.
+     * Un avión puede tener muchos asientos asociados.
+     */
+
+    public function seats()
+{
+    return $this->hasMany(AircraftSeat::class);
+}
 }

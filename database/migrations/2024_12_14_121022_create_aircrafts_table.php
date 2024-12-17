@@ -1,6 +1,3 @@
-
-
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -12,17 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('aircrafts', function (Blueprint $table) {
-            $table->id(); // ID único como clave primaria
-            $table->string('name'); // Nombre del avión con el código de la serie (ejemplo: Airbus-747)
-            $table->integer('capacity'); // Capacidad total de asientos del avión
-            $table->json('seats'); // Distribución de los asientos en JSON
-            $table->enum('status', ['borrador', 'en espera', 'completo', 'en trayecto']); // Estado del avión
+            $table->id();
+            $table->string('name');
+            $table->integer('capacity');
+            $table->enum('status', ['borrador', 'en espera', 'en trayecto', 'completo'])->default('borrador');
             $table->timestamps();
         });
     }
+
     /**
      * Reverse the migrations.
      */
@@ -31,4 +28,3 @@ return new class extends Migration
         Schema::dropIfExists('aircrafts');
     }
 };
-

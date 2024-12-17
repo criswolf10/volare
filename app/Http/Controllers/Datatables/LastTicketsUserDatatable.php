@@ -56,7 +56,7 @@ class LastTicketsUserDatatable
                 })
 
                 ->addColumn('action', function ($ticket) {
-                    $url = route('tickets.previewInvoice', ['id' => $ticket->id]);
+                    $url = route('tickets.success', ['ticketId' => $ticket->id]);
                     return '<a href="' . $url . '" class="btn btn-sm btn-primary" target="_blank">
                                 <img src="' . asset('icons/invoice.png') . '" alt="invoice">
                             </a>';

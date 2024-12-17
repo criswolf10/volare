@@ -63,7 +63,7 @@ class UsersDatatable
 
                 // Formatear la fecha y hora de creación
                 ->editColumn('created_at', function ($row) {
-                    return Carbon::parse($row->created_at)->format('d/m/Y H:i');
+                    return Carbon::parse($row->created_at)->format('d-m-Y H:i');
                 })
                 ->addColumn('action', function ($user) {
                     // Botón de edición

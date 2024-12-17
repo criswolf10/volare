@@ -21,6 +21,7 @@ class UserTicketsDatatable
                     ->with([
                         'user:id,name,lastname',
                         'flight:id,code,origin,destination',
+                        'seat:id,seat_code,class,price' // Relación con AircraftSeat
                     ])
                     ->latest();
             } elseif ($user->hasRole('admin')) {
@@ -47,14 +48,23 @@ class UserTicketsDatatable
                 ->addColumn('destination', function ($ticket) {
                     return $ticket->flight->destination ?? 'N/A';
                 })
-                ->addColumn('purchase_date', function ($ticket) {
-                    return $ticket->purchase_date ? $ticket->purchase_date->format('d/m/Y H:i') : 'N/A';
+                ->addColumn('seat_code', function ($ticket) {
+                    return $ticket->seat ? $ticket->seat->seat_code : 'N/A';
                 })
+                ->addColumn('purchase_date', function ($ticket) {
+                    return $ticket->purchase_date ? $ticket->purchase_date->format('d/m/Y H:i:s') : 'N/A';
+                })
+
                 ->addColumn('action', function ($ticket) {
-                    $url = route('tickets.previewInvoice', ['id' => $ticket->id]);
-                    return '<a href="' . $url . '" class="btn btn-sm btn-primary " target="_blank">
-                                <img src="' . asset('icons/invoice.png') . '" alt="invoice">
-                            </a>';
+                    $successButton = route('tickets.success', ['ticketId' => $ticket->id]);
+                    $successButton = '<a href="' . $successButton . '" class="btn btn-sm btn-primary " target="_blank">
+                                        <img src="' . asset('icons/invoice.png') . '" alt="invoice">
+                                    </a>';
+                    $cancelButton = route('cancel-ticket', ['ticketId' => $ticket->id]);
+                    $cancelButton = '<a href="' . $cancelButton . '" class="btn btn-sm btn-danger">
+                                        <img src="' . asset('icons/cancel.png') . '" alt="cancel">
+                                    </a>';
+                    return '<div id="action-btn" class="flex gap-3">' . $successButton . $cancelButton . '</div>';
                 })
                 ->rawColumns(['action']) // Permite HTML en esta columna
                 ->make(true);

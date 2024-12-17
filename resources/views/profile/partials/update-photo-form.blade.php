@@ -27,11 +27,6 @@
         </div>
         <div class="flex items-center gap-4 xl:w-[25%]">
             <x-tertiary-button>{{ __('Actualizar foto') }}</x-tertiary-button>
-
-            @if (session('status') === 'photo-updated')
-                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600 ">{{ __('Saved.') }}</p>
-            @endif
         </div>
     </form>
     <!-- Enlace para eliminar la foto de perfil -->

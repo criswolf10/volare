@@ -40,7 +40,7 @@ class ProfileController extends Controller
             $user->addMedia($request->file('profile_photo'))->toMediaCollection('profile_photos');
         }
 
-        return redirect()->back()->with('status', 'Foto de perfil actualizada');
+        return redirect()->back()->with('update_photo_success', 'Foto de perfil actualizada');
     }
 
     public function deletePhoto(User $user)
@@ -64,7 +64,7 @@ class ProfileController extends Controller
 
         $profileRequest->user()->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return redirect()->route('profile.edit')->with('status', 'profile-updated');
     }
 
     public function updatePassword(Request $request): RedirectResponse

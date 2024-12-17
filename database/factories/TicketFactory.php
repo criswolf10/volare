@@ -2,65 +2,50 @@
 
 namespace Database\Factories;
 
+use App\Models\Ticket;
 use App\Models\User;
 use App\Models\Flight;
-use App\Models\Ticket;
+use App\Models\AircraftSeat;
+use App\Models\Passenger;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class TicketFactory extends Factory
 {
     protected $model = Ticket::class;
 
-    public function definition()
+    public function definition(): array
     {
-        // Seleccionar un vuelo aleatorio
-        $flight = Flight::inRandomOrder()->first();
-        if (!$flight) {
-            throw new \Exception('No hay vuelos disponibles.');
+        // Obtener un usuario aleatorio o crearlo
+        $user = User::inRandomOrder()->first() ?? User::factory()->create();
+
+        // Obtener un vuelo aleatorio o crearlo
+        $flight = Flight::inRandomOrder()->first() ?? Flight::factory()->create();
+
+        // Obtener un asiento no reservado
+        $seat = AircraftSeat::where('reserved', false)
+            ->where('aircraft_id', $flight->aircraft_id)
+            ->inRandomOrder()
+            ->first();
+
+        if (!$seat) {
+            throw new \Exception("No hay asientos disponibles para el vuelo {$flight->id}");
         }
 
-        // Obtener los asientos ocupados en el vuelo
-        $occupiedSeats = $flight->tickets->pluck('seat');
+        // Marcar el asiento como reservado
+        $seat->update(['reserved' => true]);
 
-        // Decodificar el JSON de asientos del avión
-        $aircraftSeats = json_decode($flight->aircraft->seats, true);
-
-        // Aplanar el array de asientos y filtrar los disponibles
-        $availableSeats = collect($aircraftSeats)->mapWithKeys(function ($seats, $class) {
-            return collect($seats)->mapWithKeys(fn($seat) => [$seat => $class]);
-        })->diffKeys($occupiedSeats);
-
-        // Asegurarse de que hay asientos disponibles
-        if ($availableSeats->isEmpty()) {
-            throw new \Exception('No hay asientos disponibles en este vuelo.');
-        }
-
-        // Seleccionar un asiento aleatorio
-        $seat = $availableSeats->keys()->random();
-        $seatClass = $availableSeats[$seat];
-
-        // Definir precios por clase de asiento
-        $seatPrices = [
-            '1ª clase' => 150.00,
-            '2ª clase' => 100.00,
-            'turista' => 50.00,
-        ];
-
-        // Obtener un usuario aleatorio
-        $user = User::inRandomOrder()->first();
-        if (!$user) {
-            throw new \Exception('No hay usuarios disponibles.');
-        }
+        // Obtener un pasajero aleatorio o crearlo
+        $passenger = Passenger::inRandomOrder()->first() ?? Passenger::factory()->create();
 
         return [
-            'flight_id' => $flight->id,
             'user_id' => $user->id,
-            'booking_code' => $this->faker->unique()->regexify('[1-9]{5}[A-Z]{3}'),
-            'seat' => $seat,
-            'price' => $seatPrices[$seatClass] ?? 50.00, // Precio según la clase (por defecto 50.00)
-            'purchase_date' => $this->faker->dateTimeBetween('-1 month', 'now'),
+            'passenger_id' => $passenger->id, // Asociamos el ticket al pasajero
+            'flight_id' => $flight->id,
+            'aircraft_seat_id' => $seat->id,
+            'booking_code' => strtoupper(Str::random(10)),
             'quantity' => 1,
+            'purchase_date' => now(),
         ];
     }
-
 }
