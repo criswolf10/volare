@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Aircraft;
 use App\Http\Requests\AircraftRequest;
+use App\Models\Flight;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class AircraftController extends Controller
 {
@@ -61,4 +63,21 @@ class AircraftController extends Controller
         $aircraft->delete();
         return redirect()->route('aircrafts.index')->with('success', 'Avión eliminado exitosamente.');
     }
+
+
+    public function checkAircraftSeats($aircraft)
+{
+    $occupiedSeats = $aircraft->seats()->where('reserved', true)->count();
+    $totalSeats = $aircraft->seats()->count();
+
+    if ($occupiedSeats === $totalSeats) {
+        $aircraft->update(['status' => 'completo']);
+    }
+}
+
+
+
+
+
+
 }

@@ -39,7 +39,7 @@ class Flight extends Model implements HasMedia
      *
      * @var array
      */
-    protected $fillable = ['code', 'origin', 'destination', 'departure_date', 'departure_time', 'arrival_time','duration'];
+    protected $fillable = ['code', 'origin', 'destination', 'departure_date', 'departure_time', 'arrival_time','duration','aircraft_id'];
 
 
 

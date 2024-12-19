@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Str;
 
@@ -38,7 +39,7 @@ class TicketController extends Controller
     {
         $user = User::findOrFail($userId); // Obtén el usuario por su ID
 
-        return view('usertickets', compact('user'));
+        return view('usertickets',  ['userId' => $userId, 'user' => $user]);
     }
 
 
@@ -46,48 +47,42 @@ class TicketController extends Controller
      * Mostrar el formulario para crear un nuevo ticket.
      */
     public function create($flightId)
-    {
-        // Obtener los datos del vuelo
-        $flight = Flight::with('aircraft')->findOrFail($flightId);
+{
+    // Obtener datos del vuelo y sus asientos disponibles
+    $flight = Flight::with('aircraft')->findOrFail($flightId);
+    $availableSeats = AircraftSeat::where('aircraft_id', $flight->aircraft_id)
+        ->where('reserved', false)
+        ->get()
+        ->groupBy('class');
 
-        // Obtener las clases y asientos disponibles del avión asociado al vuelo
-        $availableSeats = AircraftSeat::where('aircraft_id', $flight->aircraft_id)
-            ->where('reserved', false)
-            ->get()
-            ->groupBy('class');
+    return view('purchase', [
+        'flight' => $flight,
+        'availableSeats' => $availableSeats,
+    ]);
+}
 
-        return view('purchase', [
-            'flight' => $flight,
-            'availableSeats' => $availableSeats
-        ]);
-    }
 
     /**
      * Procesar la compra del ticket.
      */
     public function store(PassengerRequest $request, $flightId)
     {
+        $userId = Auth::id();
         $flight = Flight::findOrFail($flightId);
 
-        // Verificar autenticación
-        if (!auth()->check()) {
-            return redirect()->route('login')->with('error', 'Debes estar autenticado para comprar un billete.');
-        }
-        $userId = auth()->id();
-
-        // Validar asiento
+        // Verificar disponibilidad del asiento
         $seat = AircraftSeat::where('seat_code', $request->seat_code)
             ->where('reserved', false)
             ->first();
 
         if (!$seat) {
-            return back()->with('error', 'El asiento seleccionado ya está reservado .');
+            return back()->with('error', 'El asiento seleccionado ya está reservado.');
         }
 
         try {
             DB::beginTransaction();
 
-            // Crear el pasajero en la tabla "passengers"
+            // Crear pasajero
             $passenger = Passenger::create([
                 'name' => $request->passenger_name,
                 'lastname' => $request->passenger_lastname,
@@ -99,7 +94,7 @@ class TicketController extends Controller
             // Crear el código de reserva único
             $bookingCode = 'TKT' . Str::upper(Str::random(10));
 
-            // Crear el ticket
+            // Crear ticket
             $ticket = Ticket::create([
                 'user_id' => $userId,
                 'passenger_id' => $passenger->id,
@@ -109,7 +104,6 @@ class TicketController extends Controller
                 'quantity' => 1,
                 'purchase_date' => now(),
             ]);
-            dd($request->all());
 
             // Marcar el asiento como reservado
             $seat->update(['reserved' => true]);
@@ -123,6 +117,8 @@ class TicketController extends Controller
             return back()->with('error', 'Ocurrió un error al procesar la compra. Inténtalo de nuevo.');
         }
     }
+
+
 
 
 
@@ -141,6 +137,10 @@ class TicketController extends Controller
      */
     public function destroy(Ticket $ticket)
     {
+        // Cargar explícitamente las relaciones necesarias
+        $ticket->load('flight', 'flight.aircraft', 'seat', 'passenger');
+
+
         // Asegurarse de que el ticket tenga un vuelo y un avión asociado
         if (!$ticket->flight || !$ticket->flight->aircraft) {
             return back()->with('error', 'No se puede cancelar el billete porque el vuelo o el avión no existen.');
@@ -176,12 +176,13 @@ class TicketController extends Controller
                 ? 'El billete ha sido cancelado y se reembolsará el dinero.'
                 : 'El billete ha sido cancelado, pero no se reembolsará el dinero.';
 
-            return redirect()->route('tickets.index')->with('success', $refundMessage);
+            return redirect()->route('tickets')->with('success', $refundMessage);
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Ocurrió un error al cancelar el billete.');
         }
     }
+
 
     //funcion para mostrar el formulario de cancelar ticket
 
@@ -197,14 +198,14 @@ class TicketController extends Controller
     /**
      * Descargar el PDF de la factura de un ticket.
      */
-    public function downloadInvoice($id)
-    {
-        $ticket = Ticket::with(['user', 'flight'])->findOrFail($id);
+    // public function downloadInvoice($id)
+    // {
+    //     $ticket = Ticket::with(['user', 'flight'])->findOrFail($id);
 
-        // Renderiza la vista en un PDF
-        $pdf = Pdf::loadView('preview-invoice', compact('ticket'));
+    //     // Renderiza la vista en un PDF
+    //     $pdf = Pdf::loadView('preview-invoice', compact('ticket'));
 
-        // Descargar el archivo
-        return $pdf->download('invoice_ticket_' . $ticket->id . '.pdf');
-    }
+    //     // Descargar el archivo
+    //     return $pdf->download('invoice_ticket_' . $ticket->id . '.pdf');
+    // }
 }

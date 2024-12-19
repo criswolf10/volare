@@ -98,5 +98,6 @@
                 </div>
             </div>
         </div>
+        </div>
     @endsection
 </x-app-layout>

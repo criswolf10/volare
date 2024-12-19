@@ -6,6 +6,8 @@ use App\Http\Requests\FlightRequest;
 use App\Http\Requests\UserDeleteRequest;
 use App\Http\Requests\FlightUpdateRequest;
 use App\Mail\FlightCancelled;
+use App\Mail\FlightUpdatedNotification;
+use App\Models\AircraftSeat;
 use App\Models\Flight;
 use App\Models\Aircraft;
 use Illuminate\Http\Request;
@@ -14,8 +16,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\Rule;
-use Yajra\DataTables\Facades\DataTables;
+
+
+
 
 class FlightController extends Controller
 {
@@ -33,10 +36,25 @@ class FlightController extends Controller
      */
     public function create()
     {
-       // Obtener los aviones disponibles que solo esten en estado "borrador"
-        $aircrafts = Aircraft::where('status', 'borrador')->get();
+        // Obtener los aviones disponibles que solo estén en estado "borrador"
+        $aircrafts = Aircraft::with('seats')->where('status', 'borrador')->get();
+
+        // Para cada avión, obtener las clases y precios únicos
+        foreach ($aircrafts as $aircraft) {
+            $uniqueSeats = $aircraft->seats->unique('class');
+
+            // Obtener las clases y precios de manera única
+            $aircraft->unique_classes = $uniqueSeats->pluck('class')->toArray();
+            $aircraft->unique_prices = $uniqueSeats->pluck('price')->map(function ($price) {
+                return intval($price) . '€'; // Convertir a número entero y añadir el símbolo €
+            })->toArray();
+        }
+
+        // Pasamos los aviones con las clases y precios únicos al formulario
         return view('admin.create-flights', compact('aircrafts'));
     }
+
+
 
 
     /**
@@ -44,22 +62,52 @@ class FlightController extends Controller
      */
     public function store(FlightRequest $request)
     {
-        // Crear un nuevo vuelo con los datos validados
-        $flight = Flight::create($request->validated());
+        // Obtener el avión seleccionado
+        $aircraft = Aircraft::findOrFail($request->aircraft_id);
 
+        // Cambiar el estado del avión a "en espera" si está en borrador
+        if ($aircraft->status === 'borrador') {
+            $aircraft->update(['status' => 'en espera']);
+        }
 
+        // Calcular la duración
+        $departureDateTime = Carbon::parse($request->departure_date . ' ' . $request->departure_time);
+        $arrivalDateTime = Carbon::parse($request->departure_date . ' ' . $request->arrival_time);
 
-        // Asignar la imagen por defecto al vuelo
-        $defaultImageUrl = 'icons/flights.svg';
-        $flight->addMedia(public_path($defaultImageUrl))
-            ->preservingOriginal()
-            ->usingFileName('flights.png') // Nombre de la imagen
-            ->toMediaCollection('flight_images'); // Nombre de la colección
+        // Validar que la hora de llegada sea posterior a la hora de salida
+        if ($arrivalDateTime->lt($departureDateTime)) {
+            return back()->withErrors(['arrival_time' => 'La hora de llegada debe ser posterior a la hora de salida.']);
+        }
 
-        // Redireccionar a la vista de vuelos con un mensaje
-        return redirect()->route('flights')->with('success', '¡Vuelo creado correctamente!');
+        $durationInMinutes = $departureDateTime->diffInMinutes($arrivalDateTime);
+
+        // Convertir la duración en formato "HH:MM:SS"
+        $hours = intdiv($durationInMinutes, 60);
+        $minutes = $durationInMinutes % 60;
+        $durationTime = sprintf('%02d:%02d:00', $hours, $minutes); // Formato "HH:MM:SS"
+
+        // Crear el vuelo con el id del avión seleccionado
+        $flight = Flight::create([
+            'code' => $request->code,
+            'origin' => $request->origin,
+            'destination' => $request->destination,
+            'departure_date' => Carbon::parse($request->departure_date)->format('Y-m-d'),
+            'departure_time' => Carbon::parse($request->departure_time)->format('H:i:s'),
+            'arrival_time' => Carbon::parse($request->arrival_time)->format('H:i:s'),
+            'duration' => $durationTime, // Guardar la duración correctamente formateada
+            'aircraft_id' => $request->aircraft_id, // Guardar el id del avión seleccionado
+        ]);
+
+        // Verificar si la hora de salida ya pasó para cambiar el estado a "en trayecto"
+        $now = Carbon::now();
+        if ($now->greaterThanOrEqualTo($departureDateTime)) {
+            // Si la hora actual es mayor o igual a la hora de salida, cambia el estado a "en trayecto"
+            $aircraft->update(['status' => 'en trayecto']);
+        }
+
+        // Redirigir o devolver la respuesta
+        return redirect()->route('flights.create')->with('success', 'Vuelo creado correctamente');
     }
-
 
     /**
      * Show the form for editing the specified resource.
@@ -69,6 +117,7 @@ class FlightController extends Controller
     {
         // Obtener el vuelo específico con sus tickets relacionados y el avión
         $flight = Flight::with('tickets', 'aircraft')->findOrFail($id);
+
 
         // Obtener aviones en estado "borrador" para el select
         $aircrafts = Aircraft::where('status', 'borrador')->get();
@@ -88,47 +137,52 @@ class FlightController extends Controller
         // Obtener el vuelo específico
         $flight = Flight::findOrFail($id);
 
-        // Actualizar los datos del vuelo
-        $flight->update([
-            'aircraft_id' => $request->input('aircraft_id'),
-            'departure_date' => $request->input('departure_date'),
-            'departure_time' => Carbon::parse($request->input('departure_time'))->format('H:i'),
-            'arrival_time' => Carbon::parse($request->input('arrival_time'))->format('H:i'),
-        ]);
+        // Comparar los valores actuales con los nuevos (usando Carbon para comparación precisa)
+        $departureDateChanged = $flight->departure_date !== $request->input('departure_date');
+        $departureTimeChanged = !Carbon::parse($flight->departure_time)->equalTo(Carbon::parse($request->input('departure_time')));
+        $arrivalTimeChanged = !Carbon::parse($flight->arrival_time)->equalTo(Carbon::parse($request->input('arrival_time')));
 
-        // Calcular la duración del vuelo
-        $departureTime = Carbon::parse($request->input('departure_time'));
-        $arrivalTime = Carbon::parse($request->input('arrival_time'));
-        $durationInMinutes = $departureTime->diffInMinutes($arrivalTime);
+        // Si al menos uno de los campos ha cambiado, actualizar y enviar notificaciones
+        if ($departureDateChanged || $departureTimeChanged || $arrivalTimeChanged) {
+            // Actualizar los datos del vuelo
+            $flight->update([
+                'departure_date' => $request->input('departure_date'),
+                'departure_time' => Carbon::parse($request->input('departure_time'))->format('H:i'),
+                'arrival_time' => Carbon::parse($request->input('arrival_time'))->format('H:i'),
+            ]);
 
-        // Convertir la duración a formato legible
-        $formattedDuration = sprintf(
-            '%d hora%s%s%d minuto%s',
-            floor($durationInMinutes / 60),
-            floor($durationInMinutes / 60) > 1 ? 's' : '',
-            floor($durationInMinutes / 60) && $durationInMinutes % 60 ? ' y ' : '',
-            $durationInMinutes % 60,
-            $durationInMinutes % 60 > 1 ? 's' : ''
-        );
+            // Calcular la duración en minutos
+            $departureTime = Carbon::parse($request->input('departure_time'));
+            $arrivalTime = Carbon::parse($request->input('arrival_time'));
+            $durationInMinutes = $departureTime->diffInMinutes($arrivalTime);
 
-        // Actualizar la duración en el modelo
-        $flight->duration = trim($formattedDuration, ' y ');
+            // Convertir minutos al formato HH:mm:ss
+            $hours = floor($durationInMinutes / 60);
+            $minutes = $durationInMinutes % 60;
+            $flight->duration = sprintf('%02d:%02d:%02d', $hours, $minutes, 0); // Formato HH:mm:ss
 
-        // Actualizar los precios de los tickets
-        foreach (['1ª clase' => 'price_first_class', '2ª clase' => 'price_second_class', 'turista' => 'price_tourist'] as $class => $inputField) {
-            if ($request->has($inputField)) {
-                Ticket::where('flight_id', $flight->id)
-                    ->where('class', $class)
-                    ->update(['price' => $request->input($inputField)]);
+            // Guardar los cambios
+            $flight->save();
+
+            // Enviar correos a los usuarios con tickets relacionados
+            $tickets = Ticket::where('flight_id', $flight->id)->get();
+
+            foreach ($tickets as $ticket) {
+                $user = $ticket->user; // Suponiendo relación user en Ticket
+
+                // Enviar notificación
+                Mail::to($user->email)->send(new FlightUpdatedNotification($flight, $user));
             }
+
+            // Redirigir con mensaje de éxito
+            return redirect()->route('flights')->with('success_updated_flight_notificacion', 'Vuelo actualizado correctamente y se ha notificado a los usuarios con los cambios del vuelo.');
         }
 
-        // Actualizar los datos del vuelo
-        $flight->save();
-
-        // Redirigir con mensaje de éxito
-        return redirect()->route('flights')->with('success', 'Vuelo actualizado correctamente.');
+        // Si no hubo cambios, redirigir con mensaje de información
+        return redirect()->route('flights')->with('success_updated_flight', 'No se realizaron cambios en el vuelo, por lo tanto no se enviaron notificaciones.');
     }
+
+
 
 
     /**
@@ -163,7 +217,7 @@ class FlightController extends Controller
 
             // Verificar que el ticket tiene un usuario asociado
             if ($user) {
-                Mail::to($user->email)->send(new FlightCancelled($flight));
+                Mail::to($user->email)->send(new FlightCancelled($flight, $user));
             }
         }
 
@@ -185,13 +239,20 @@ class FlightController extends Controller
     public function dashboard()
     {
         $user = auth()->user();
-
-        // Datos para clientes: Últimos vuelos recientes
-        $latestFlights = Flight::latest()->take(5)->get();
-
+        // Datos para clientes: Últimos vuelos cuyo avión tiene el estado "en espera" y tienen asientos disponibles (máximo 4)
+        $latestFlights = Flight::whereHas('aircraft', function ($query) {
+            $query->where('status', 'en espera');  // Filtra solo los aviones con estado "en espera"
+        })
+            ->where(function ($query) {
+                $query->whereRaw('(SELECT COUNT(*) FROM tickets WHERE flight_id = flights.id AND status = "en espera") < flights.capacity')  // Verifica que hay asientos disponibles
+                    ->orWhereRaw('(SELECT COUNT(*) FROM tickets WHERE flight_id = flights.id) < flights.capacity');  // O permite vuelos con menos asientos ocupados
+            })
+            ->latest()  // Ordena por la fecha de creación más reciente
+            ->take(4)   // Limita a los últimos 4 vuelos
+            ->get();
         // Datos para administradores: Vuelos con más plazas vacantes
         $flightsWithVacancies = Flight::withCount(['tickets as seats_taken' => function ($query) {
-            $query->where('status', 'confirmed');
+            $query->where('status', 'en espera');
         }])
             ->get()
             ->map(function ($flight) {
@@ -205,5 +266,33 @@ class FlightController extends Controller
             ->take(5);
 
         return view('dashboard', compact('latestFlights', 'flightsWithVacancies'));
+    }
+
+    public function updateAircraftStatus()
+    {
+        $currentDate = Carbon::now()->toDateString(); // Fecha actual
+        $currentTime = Carbon::now(); // Fecha y hora actual
+
+        // Filtrar vuelos con fecha de salida igual a la actual
+        $flights = Flight::with('aircraft')
+            ->where('departure_date', $currentDate)
+            ->get();
+
+        foreach ($flights as $flight) {
+            // Concatenar fecha y hora para comparación
+            $departureDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $flight->departure_date . ' ' . $flight->departure_time);
+            $arrivalDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $flight->departure_date . ' ' . $flight->arrival_time);
+
+            if ($currentTime->greaterThanOrEqualTo($departureDateTime) && $currentTime->lessThan($arrivalDateTime)) {
+                // Si la hora actual está entre la salida y la llegada -> "en trayecto"
+                $flight->aircraft->update(['status' => 'en trayecto']);
+            } elseif ($currentTime->greaterThanOrEqualTo($arrivalDateTime)) {
+                // Si ya pasó la hora de llegada -> "finalizado"
+                $flight->aircraft->update(['status' => 'finalizado']);
+            } else {
+                // Si aún no ha llegado la hora de salida -> "en espera"
+                $flight->aircraft->update(['status' => 'en espera']);
+            }
+        }
     }
 }

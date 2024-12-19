@@ -12,78 +12,82 @@
             </div>
         @endif
 
-        <div class="p-6">
-            <h2 class="text-2xl font-bold mb-4">Compra de Billete para el vuelo {{ $flight->code }}</h2>
+        <div class="p-6 space-y-6">
+            <h2 class="text-2xl xl:text-3xl font-bold text-gray-900">Compra de Billete para el vuelo {{ $flight->code }}</h2>
 
             <!-- Información del vuelo -->
-            <div class="mb-4">
-                <p><strong>Origen:</strong> {{ $flight->origin }}</p>
-                <p><strong>Destino:</strong> {{ $flight->destination }}</p>
-                <p><strong>Fecha de salida:</strong> {{ $flight->departure_date }}</p>
-                <p><strong>Hora de salida:</strong> {{ $flight->departure_time }} </p>
-                <p><strong>Duración:</strong> {{ $flight->duration }}</p>
+            <div class="bg-[#E4F2F2] p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4">Detalles del vuelo</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div><strong>Origen:</strong> {{ $flight->origin }}</div>
+                    <div><strong>Destino:</strong> {{ $flight->destination }}</div>
+                    <div><strong>Fecha de salida:</strong> {{ $flight->departure_date }}</div>
+                    <div><strong>Hora de salida:</strong> {{ $flight->departure_time }} </div>
+                    <div><strong>Duración:</strong> {{ $flight->duration }}</div>
+                </div>
             </div>
 
-            <!-- Formulario -->
+            <!-- Formulario de compra -->
             <form action="{{ route('tickets.processPurchase', $flight->id) }}" method="POST">
                 @csrf
-                @method('patch')
-                <!-- Informacion del pasajero (nombre, apellidos, ) -->
-                <div class="mb-4">
-                    <label for="name" class="block text-gray-700 font-bold mb-2">Nombre:</label>
-                    <input type="text" id="name" name="name" required class="w-full p-2 border rounded"
-                        placeholder="Nombre del pasajero">
-                </div>
-                <div class="mb-4">
-                    <label for="lastname" class="block text-gray-700 font-bold mb-2">Apellidos:</label>
-                    <input type="text" id="lastname" name="lastname" required class="w-full p-2 border rounded"
-                        placeholder="Apellidos del pasajero">
-                </div>
-                <div class="mb-4">
-                    <label for="email" class="block text-gray-700 font-bold mb-2">Correo electrónico:</label>
-                    <input type="email" id="email" name="email" class="w-full p-2 border rounded"
-                        placeholder="Correo electrónico del pasajero">
+
+
+                <!-- Sección de información del pasajero -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="mb-4">
+                        <label for="name" class="block text-gray-700 font-semibold mb-2">Nombre:</label>
+                        <input type="text" id="name" name="name" class="w-full p-3 border rounded-lg" placeholder="Nombre del pasajero" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="lastname" class="block text-gray-700 font-semibold mb-2">Apellidos:</label>
+                        <input type="text" id="lastname" name="lastname" class="w-full p-3 border rounded-lg" placeholder="Apellidos del pasajero" required>
+                    </div>
                 </div>
 
-                <div class="mb-4">
-                    <label for="dni" class="block text-gray-700 font-bold mb-2">Documento de Identidad:</label>
-                    <input type="text" id="dni" name="dni" class="w-full p-2 border rounded"
-                        placeholder="Documento de identidad del pasajero">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="mb-4">
+                        <label for="email" class="block text-gray-700 font-semibold mb-2">Correo electrónico:</label>
+                        <input type="email" id="email" name="email" class="w-full p-3 border rounded-lg" placeholder="Correo electrónico" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="dni" class="block text-gray-700 font-semibold mb-2">Documento de Identidad:</label>
+                        <input type="text" id="dni" name="dni" class="w-full p-3 border rounded-lg" placeholder="Documento de identidad" required>
+                    </div>
                 </div>
 
-                <!-- campo telefono -->
-                <div class="mb-4">
-                    <label for="phone" class="block text-gray-700 font-bold mb-2">Teléfono:</label>
-                    <input type="text" id="phone" name="phone" class="w-full p-2 border rounded"
-                        placeholder="Teléfono del pasajero">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="mb-4">
+                        <label for="phone" class="block text-gray-700 font-semibold mb-2">Teléfono:</label>
+                        <input type="text" id="phone" name="phone" class="w-full p-3 border rounded-lg" placeholder="Teléfono del pasajero" required>
+                    </div>
 
-                <!-- Selector de clase -->
-                <div class="mb-4">
-                    <label for="class" class="block text-gray-700 font-bold mb-2">Clase:</label>
-                    <select id="class" name="class" required onchange="updateSeats()"
-                        class="w-full p-2 border rounded">
-                        <option value="">Selecciona una clase</option>
-                        @foreach ($availableSeats as $class => $seats)
-                            <option value="{{ $class }}">{{ ucfirst(str_replace('_', ' ', $class)) }}</option>
-                        @endforeach
-                    </select>
+                    <!-- Selector de clase -->
+                    <div class="mb-4">
+                        <label for="class" class="block text-gray-700 font-semibold mb-2">Clase:</label>
+                        <select id="class" name="class" onchange="updateSeats()" class="w-full p-3 border rounded-lg" required>
+                            <option value="">Selecciona una clase</option>
+                            @foreach ($availableSeats as $class => $seats)
+                                <option value="{{ $class }}">{{ ucfirst(str_replace('_', ' ', $class)) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Selector de asiento -->
-                <div class="mb-4">
-                    <label for="seat_code" class="block text-gray-700 font-bold mb-2">Número de Asiento:</label>
-                    <select id="seat_code" name="seat_code" required class="w-full p-2 border rounded">
+                <div class="mb-6">
+                    <label for="seat_code" class="block text-gray-700 font-semibold mb-2">Número de Asiento:</label>
+                    <select id="seat_code" name="seat_code" class="w-full p-3 border rounded-lg" required>
                         <option value="">Selecciona un asiento</option>
                         <!-- Opciones dinámicas con JavaScript -->
                     </select>
                 </div>
 
                 <!-- Precio del billete -->
-                <div class="mb-4">
+                <div class="mb-6">
                     <p id="seat-price" class="text-lg font-bold">Precio: --</p>
                 </div>
 
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                <button type="submit" class="bg-[#22B3B2] text-white px-6 py-3 rounded-lg hover:bg-opacity-75 transition duration-300">
                     Comprar
                 </button>
             </form>
@@ -115,8 +119,7 @@
 
             document.getElementById('seat_code').addEventListener('change', function() {
                 const selectedOption = this.options[this.selectedIndex];
-                document.getElementById('seat-price').textContent = 'Precio: ' + (selectedOption.dataset.price ||
-                    '--') + '€';
+                document.getElementById('seat-price').textContent = 'Precio: ' + (selectedOption.dataset.price || '--') + '€';
             });
         </script>
     @endsection

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UserRequest;
+use App\Http\Requests\RegisteredUserRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -27,15 +27,15 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(UserRequest $UserRequest)
+    public function store(RegisteredUserRequest $RegisteredUserRequest)
     {
 
         $user = User::create([
-            'name' => $UserRequest->name,
-            'lastname' => $UserRequest->lastname,
-            'email' => $UserRequest->email,
-            'phone' => $UserRequest->phone,
-            'password' => Hash::make($UserRequest->password),
+            'name' => $RegisteredUserRequest->name,
+            'lastname' => $RegisteredUserRequest->lastname,
+            'email' => $RegisteredUserRequest->email,
+            'phone' => $RegisteredUserRequest->phone,
+            'password' => Hash::make($RegisteredUserRequest->password),
         ]);
 
         // Asignar rol basado en si es el primer usuario

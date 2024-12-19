@@ -26,6 +26,45 @@
             </x-modal>
         @endif
 
+        @if (session('success_updated_flight_notificacion'))
+            <x-modal name="flight-update-modal" show="true">
+                <!-- Mensaje de éxito -->
+                <div class="text-center py-8">
+                    <h3 class="text-xl font-semibold text-green-600">Vuelo actualizado correctamente!</h3>
+                    <p class="mt-2 text-gray-600">Vuelo actualizado correctamente y se ha notificado a los usuarios con los
+                        cambios del vuelo.
+                    </p>
+                </div>
+
+                <!-- Botón de acción -->
+                <div class="flex justify-around mb-6">
+                    <a href="{{ route('flights') }}"
+                        class="px-4 py-2 bg-[#22B3B2] hover:bg-opacity-75 text-white rounded-lg">
+                        Aceptar
+                    </a>
+                </div>
+            </x-modal>
+        @endif
+        @if (session('success_updated_flight'))
+            <x-modal name="flight-update-modal" show="true">
+                <!-- Mensaje de éxito -->
+                <div class="text-center py-8">
+                    <h3 class="text-xl font-semibold text-green-600">Vuelo actualizado correctamente!</h3>
+                    <p class="mt-2 text-gray-600">No se realizaron cambios en el vuelo, por lo tanto no se enviaron
+                        notificaciones.
+                    </p>
+                </div>
+
+                <!-- Botón de acción -->
+                <div class="flex justify-around mb-6">
+                    <a href="{{ route('flights') }}"
+                        class="px-4 py-2 bg-[#22B3B2] hover:bg-opacity-75 text-white rounded-lg">
+                        Aceptar
+                    </a>
+                </div>
+            </x-modal>
+        @endif
+
         {{-- Modal de Error: Vuelo en trayecto --}}
         @if (session('error'))
             <x-modal name="flight-delete-error" show="true">
@@ -42,9 +81,9 @@
 
         <div class=" p-5 h-full w-full">
             <div
-                class="{{ auth()->check() && auth()->user()->hasRole('admin') ? 'flex justify-center items-center w-full mb-6 p-3' : 'flex justify-start items-center w-full mb-6 p-3' }}">
-                <!-- Contenedor de los botones de filtro y añadir usuario -->
-                <div class="flex justify-start items-center w-[50%] gap-5">
+                class="{{ auth()->check() && auth()->user()->hasRole('admin') ? 'flex flex-col md:flex-row justify-between items-center w-full mb-5 p-3 gap-3' : 'flex justify-start items-center w-full mb-6 p-3' }}">
+                <!-- Contenedor de los botones de filtro y añadir vuelo -->
+                <div class="flex justify-start items-center gap-3 w-full md:w-[50%]">
 
                     <!-- Botón para abrir el modal de filtro -->
                     <button class="flex items-center justify-center bg-[#22B3B2] w-10 h-10 rounded cursor-pointer"
@@ -58,7 +97,7 @@
 
                 @role('admin')
                     <!-- Botón para añadir un nuevo usuario -->
-                    <div class="flex justify-end items-center w-[50%]">
+                    <div class="flex justify-center md:justify-end items-center w-full md:w-[50%]">
                         <div>
                             <x-tertiary-button>
                                 <a href="{{ route('flights.create') }}">+ Añadir vuelo</a>
@@ -151,7 +190,7 @@
                     {{-- Botón de Confirmar Eliminación --}}
                     <div class="mt-6 flex justify-center">
                         <x-danger-button x-on:click.prevent="submitForm()">
-                            {{ __('Delete flight') }}
+                            {{ __('Cancelar vuelo') }}
                         </x-danger-button>
                     </div>
                 </form>

@@ -15,6 +15,7 @@
             'email',
             'phone',
             'dni',
+            'tickets_id'
         ];
 
         /**

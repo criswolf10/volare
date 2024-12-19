@@ -39,31 +39,42 @@ class TicketsDatatable
                     return $ticket->flight ? $ticket->flight->destination : 'N/A';
                 })
                 ->addColumn('price', function ($ticket) {
-                    return $ticket->seat ? '$' . number_format($ticket->seat->price, 2) : 'N/A';
+                    return $ticket->seat ? '€' . number_format($ticket->seat->price, 2) : 'N/A';
                 })
                 ->addColumn('seat_code', function ($ticket) {
-                    return $ticket->seat ? $ticket->seat->seat_code : 'N/A';
+                    return '<div class="text-center">' . ($ticket->seat ? $ticket->seat->seat_code : 'N/A') . '</div>';
                 })
+                ->addColumn('quantity', function ($ticket) {
+                    return '<div class="text-center">' . ($ticket->quantity ? $ticket->quantity : 'N/A') . '</div>';
+                })
+
+
 
                 ->addColumn('duration', function ($ticket) {
                     // Verificar si la relación 'flight' existe antes de acceder a 'duration'
-                    return $ticket->flight ? $ticket->flight->duration : 'N/A';
+                    if ($ticket->flight && $ticket->flight->duration) {
+                        $duration = Carbon::createFromFormat('H:i:s', $ticket->flight->duration);
+                        $hours = $duration->hour;
+                        $minutes = $duration->minute;
+
+                        $formattedDuration = $hours > 0 ? "{$hours} h {$minutes} min" : "{$minutes} min";
+
+                        return '<div class="text-center">' . $formattedDuration . '</div>';
+                    }
+
+                    return '<div class="text-center">N/A</div>';
                 })
                 ->addColumn('purchase_date', function ($ticket) {
                     return $ticket->purchase_date ? $ticket->purchase_date->format('d/m/Y H:i:s') : 'N/A';
                 })
 
                 ->addColumn('action', function ($ticket) {
-                    return '<a href="' . route('user-tickets', ['userId' => $ticket->user->id]) . '" class="btn btn-sm btn-info mx-2">
+                    return '<a href="' . route('user-tickets', ['userId' => $ticket->user->id]) . '" class="flex items-center justify-center btn btn-sm btn-info mx-2">
                                 <img src="' . asset('icons/history-tickets.png') . '" alt="view">
                             </a>';
                 })
 
-
-
-
-
-                ->rawColumns(['action'])
+                ->rawColumns(['action','seat_code', 'quantity','duration'])
                 ->make(true);
         }
     }

@@ -41,16 +41,45 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $credentials = $this->only('email', 'password');
+
+        // Validación adicional para asegurar que los campos no estén vacíos
+        if (empty($credentials['email'])) {
+            throw ValidationException::withMessages([
+                'email' => 'El correo electrónico es obligatorio. Por favor, ingrésalo.',
+            ]);
+        }
+
+        if (empty($credentials['password'])) {
+            throw ValidationException::withMessages([
+                'password' => 'La contraseña es obligatoria. Por favor, ingrésala.',
+            ]);
+        }
+
+        $user = \App\Models\User::where('email', $credentials['email'])->first();
+
+        // Verificamos si el usuario existe
+        if (!$user) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => 'El correo electrónico proporcionado no es correcto.',
+            ]);
+        }
+
+        // Si el usuario existe, verificamos la contraseña
+        if (!Auth::attempt($credentials, $this->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'password' => 'La contraseña ingresada es incorrecta. Intenta nuevamente.',
             ]);
         }
 
         RateLimiter::clear($this->throttleKey());
     }
+
+
 
     /**
      * Ensure the login request is not rate limited.
@@ -68,19 +97,15 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'email' => 'Demasiados intentos fallidos. Intenta nuevamente en :minutes minuto(s).',
         ]);
     }
 
     /**
-     * Get the rate limiting throttle key for the request.
+     * Obtener la clave de limitación de tasa para la solicitud.
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
     }
-
 }

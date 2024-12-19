@@ -1,12 +1,11 @@
-<section>
-<div class="flex flex-col justify-start bg-white shadow-lg rounded-lg p-5 gap-2">
-        <h2 class="text-lg xl:text-3xl font-semibold text-gray-900">
-            {{ __('Profile Information') }}
-        </h2>
+<div class="flex flex-col justify-center h-full bg-white shadow-lg rounded-lg p-5 gap-2">
+    <h2 class="text-lg md:text-2xl xl:text-3xl font-semibold text-gray-900">
+        {{ __('Profile Information') }}
+    </h2>
 
-        <p class="mt-1 text-sm text-gray-600 font-semibold">
-            {{ __("Update your personal's data and email address.") }}
-        </p>
+    <p class="mt-1 text-sm text-gray-600 font-semibold">
+        {{ __("Update your personal's data and email address.") }}
+    </p>
 
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
@@ -16,30 +15,35 @@
         @csrf
         @method('patch')
 
-        <div class="mb-3 xl:w-[50%]">
+        <!-- Nombre -->
+        <div class="mb-3">
             <x-input-label for="name" :value="__('Name')" />
             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)"
-                required autofocus autocomplete="given-name" />
+                autofocus autocomplete="given-name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
-        <div class="mb-3 xl:w-[50%]">
+        <!-- Apellido -->
+        <div class="mb-3">
             <x-input-label for="lastname" :value="__('Lastname')" />
             <x-text-input id="lastname" name="lastname" type="text" class="mt-1 block w-full" :value="old('lastname', $user->lastname)"
-                required autofocus autocomplete="family-name" />
+                autofocus autocomplete="family-name" />
             <x-input-error class="mt-2" :messages="$errors->get('lastname')" />
         </div>
-        <div class="mb-3 xl:w-[50%]">
+
+        <!-- Teléfono -->
+        <div class="mb-3">
             <x-input-label for="phone" :value="__('Phone')" />
             <x-text-input id="phone" name="phone" type="tel" class="mt-1 block w-full" :value="old('phone', $user->phone)"
-                required autofocus autocomplete="tel" pattern="\d{9}" maxlength="9" inputmode="numeric" />
+                autofocus autocomplete="tel" pattern="\d{9}" maxlength="9" inputmode="numeric" />
             <x-input-error class="mt-2" :messages="$errors->get('phone')" />
         </div>
 
-        <div class="mb-3 xl:w-[50%]">
+        <!-- Email -->
+        <div class="mb-3">
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)"
-                required autocomplete="email" />
+                autocomplete="email" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$user->hasVerifiedEmail())
@@ -62,7 +66,8 @@
             @endif
         </div>
 
-        <div class="flex items-center gap-4 xl:w-[25%]">
+        <!-- Botón Guardar -->
+        <div class="mt-4 flex justify-end gap-4">
             <x-tertiary-button>{{ __('Save') }}</x-tertiary-button>
 
             @if (session('status') === 'profile-updated')
@@ -72,5 +77,3 @@
         </div>
     </form>
 </div>
-</div>
-</section>

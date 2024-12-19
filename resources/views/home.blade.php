@@ -36,7 +36,7 @@
                         Destinos populares
                     </h3>
                 </div>
-                <div class="flex gap-6">
+                <div class="flex flex-col md:flex-col lg:flex-row  gap-6">
 
                     <!-- Carta 1 -->
                     <x-card title="Tailandia" image="img/tailandia.jpg" />
@@ -46,7 +46,7 @@
 
                     <!-- Carta 3 -->
                     <x-card title="Estambul" image="img/estambul.jpg" />
-                    
+
                 </div>
             </div>
         </div>

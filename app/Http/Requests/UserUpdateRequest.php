@@ -3,7 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use App\Models\User;
 
 class UserUpdateRequest extends FormRequest
 {
@@ -22,18 +24,21 @@ class UserUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->route('id'); // ID del usuario actual
+
         return [
-            'name' => ['nullable', 'string', 'min:3', 'max:40'], // No es obligatorio, solo si se cambia
-            'lastname' => ['nullable', 'string', 'min:3', 'max:70'], // No es obligatorio, solo si se cambia
+            'name' => ['sometimes', 'nullable', 'string', 'min:3', 'max:40'],
+            'lastname' => ['sometimes', 'nullable', 'string', 'min:3', 'max:70'],
             'email' => [
+                'sometimes', // Solo validar si está presente
                 'required',
-                'string',
                 'email',
                 'max:255',
-                // Único solo si el email cambia, ignorando el usuario actual
-                "unique:users,email,{$this->route('id')}"
+                // Validar que sea único solo si cambia
+                Rule::unique('users', 'email')->ignore($userId),
             ],
             'password' => [
+                'sometimes',
                 'nullable',
                 'confirmed',
                 Password::min(8)
@@ -43,13 +48,17 @@ class UserUpdateRequest extends FormRequest
                     ->symbols(),
             ],
             'phone' => [
-                'nullable', // Permite que el teléfono sea nulo
-                'regex:/^\d{9}$/', // Solo números, exactamente 9 caracteres
-                "unique:users,phone,{$this->route('id')}", // Único solo si el teléfono cambia
+                'sometimes', // Solo validar si está presente
+                'nullable',
+                'regex:/^\d{9}$/', // Validar formato si hay valor
+                Rule::unique('users', 'phone')->ignore($userId),
             ],
-
+            'role' => ['sometimes', 'string', 'exists:roles,name'], // Validar roles si se incluyen
         ];
     }
+
+
+
 
     /**
      * Custom error messages for validation
@@ -57,12 +66,12 @@ class UserUpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'The name field is required.',
-            'name.min' => 'The name must be at least 3 characters.',
-            'lastname.required' => 'The lastname field is required.',
-            'email.unique' => 'This email is already in use.',
-            'phone.unique' => 'This phone number is already registered.',
-            'password.confirmed' => 'The passwords do not match.',
+            'name.required' => 'El campo nombre es obligatorio.',
+            'name.min' => 'El nombre debe tener al menos 3 caracteres.',
+            'lastname.required' => 'El campo apellido es obligatorio.',
+            'email.unique' => 'Este correo electrónico ya está en uso.',
+            'phone.unique' => 'Este número de teléfono ya está registrado.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
         ];
     }
 

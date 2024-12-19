@@ -38,38 +38,36 @@
                 </div>
             </x-modal>
         @endif
-         {{-- Modal de Error: No puedes eliminarte a ti mismo --}}
-         @if (session('error'))
-         <x-modal name="user-delete-error" show="true">
-             <div class="text-center py-8">
-                 <h3 class="text-xl font-semibold text-red-600">No se puedes eliminarte a ti mismo</h3>
-                 <p class="mt-2 text-gray-600">{{ session('error') }}</p>
-             </div>
-             <div class="flex justify-around mb-6">
-                 <a href="{{ route('users') }}"
-                     class="px-4 py-2 bg-[#f44336] hover:bg-opacity-75 text-white rounded-lg">Aceptar</a>
-             </div>
-         </x-modal>
-     @endif
+        {{-- Modal de Error: No puedes eliminarte a ti mismo --}}
+        @if (session('error'))
+            <x-modal name="user-delete-error" show="true">
+                <div class="text-center py-8">
+                    <h3 class="text-xl font-semibold text-red-600">No puedes eliminar esta cuenta</h3>
+                    <p class="mt-2 text-gray-600">{{ session('error') }}</p>
+                </div>
+                <div class="flex justify-around mb-6">
+                    <a href="{{ route('users') }}"
+                        class="px-4 py-2 bg-[#f44336] hover:bg-opacity-75 text-white rounded-lg">Aceptar</a>
+                </div>
+            </x-modal>
+        @endif
 
         <div class=" p-5 h-full w-full">
-            <div class="flex justify-center items-center w-full mb-5 p-3">
+            <div class="flex flex-col md:flex-row justify-between items-center w-full mb-5 p-3 gap-3">
 
                 <!-- Contenedor de los botones de filtro y añadir usuario -->
-                <div class="flex justify-start items-center w-[50%] gap-5">
-
+                <div class="flex justify-start items-center gap-3 w-full md:w-[50%]">
                     <!-- Botón para abrir el modal de filtro -->
-                    <button class="flex items-center justify-center bg-[#22B3B2] w-10 h-10 rounded cursor-pointer"
-                        id="filter-button">
+                    <button class="flex items-center justify-center bg-[#22B3B2] w-10 h-10 rounded cursor-pointer" id="filter-button">
                         <img src="{{ asset('icons/filter.png') }}" class="w-5 h-5">
                     </button>
 
                     <!-- Contenedor del buscador -->
-                    <div id="custom-search-container"></div>
+                    <div id="custom-search-container" class="flex-1"></div>
                 </div>
 
                 <!-- Botón para añadir un nuevo usuario -->
-                <div class="flex justify-end items-center w-[50%]">
+                <div class="flex justify-center md:justify-end items-center w-full md:w-[50%]">
                     <div>
                         <x-tertiary-button>
                             <a href="{{ route('create-users') }}">+ Añadir usuario</a>

@@ -3,7 +3,7 @@
     <div class="bg-[#0A2827] flex flex-col h-auto p-3 w-full md:h-full lg:w-[50%] xl:h-full xl:w-[30%] justify-center items-center">
         <div class="flex w-full min-h-[40%] sm:w-[75%] lg:w-[90%]">
 
-                <x-auth-session-status class="mb-4" :status="session('status')" />
+
                 <form method="POST" action="{{ route('password.email') }}"
                     class="w-full flex flex-col justify-center items-center">
                     @csrf
@@ -12,10 +12,11 @@
                         {{ __('No te preocupes. Ingresa tu dirección de correo electrónico y te enviaremos un enlace para restablecerla.') }}
                     </div>
                     <!-- Email Address -->
-
+                    <x-auth-session-status class="mb-4" :status="session('status')" />
+                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     <div class="flex justify-center items-venter w-full mb-3">
                         <x-input-label for="email" />
-                        <x-text-input id="email" type="email" name="email" required autofocus
+                        <x-text-input id="email" type="email" name="email"  autofocus
                             autocomplete="username" placeholder="Email" />
                     </div>
                     <x-primary-button>

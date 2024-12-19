@@ -2,18 +2,15 @@
 
 namespace App\Mail;
 
+use App\Models\Flight;
+use App\Models\Ticket;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use App\Models\flight;
 
-class FlightCancelled extends Mailable
+class FlightUpdatedNotification extends Mailable
 {
     use Queueable, SerializesModels;
-
 
     public $flight;
     public $user;
@@ -25,17 +22,21 @@ class FlightCancelled extends Mailable
      * @param  User  $user
      * @return void
      */
-    public function __construct(flight $flight, $user)
+    public function __construct(Flight $flight, $user)
     {
         $this->flight = $flight;
         $this->user = $user;
     }
 
-
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
     public function build()
     {
-        return $this->subject('Your flight has been cancelled')
-                    ->view('emails.flight-cancelled')
+        return $this->subject('Cambio de Fecha y Hora de tu Vuelo')
+                    ->view('emails.flight_updated')
                     ->with([
                         'flight' => $this->flight,
                         'user' => $this->user,

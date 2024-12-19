@@ -40,11 +40,9 @@ class FlightsDatatable
                 ->addColumn('aircraft', function ($flight) {
                     return $flight->aircraft->name ?? 'N/A';
                 })
-
                 ->addColumn('price', function ($flight) {
-                    // Obtener el precio mínimo entre los asientos disponibles
+                    // Obtener el precio mínimo entre todos los asientos del avión
                     $minPrice = $flight->aircraft->seats()
-                        ->where('reserved', false)
                         ->min('price');
 
                     if ($minPrice) {
@@ -53,16 +51,17 @@ class FlightsDatatable
                     return 'N/A';
                 })
 
+
                 ->addColumn('seats', function ($flight) {
-                    // Obtener las clases de asientos disponibles
+                    // Obtener las clases de todos los asientos del avión
                     $seatClasses = $flight->aircraft->seats()
-                        ->where('reserved', false)
                         ->distinct()
                         ->pluck('class')
                         ->toArray();
 
                     return implode(', ', $seatClasses) ?: 'N/A';
                 })
+
 
                 ->addColumn('departure_date', function ($flight) {
                     return Carbon::parse($flight->departure_date)->format('d/m/Y');
@@ -84,7 +83,8 @@ class FlightsDatatable
                             'en espera' => '#ffc107',
                             'en trayecto' => '#17a2b8',
                             'completo' => '#28a745',
-                            default => '#f8f9fa',
+                            'finalizado' => '#ff0000',
+                            default => '#ff0000',
                         };
 
                         return "<div style='background-color: {$statusColor}; color: white; padding: 3px 7px; border-radius: 5px; font-size: 0.75rem; text-align: center;'>" . ucfirst($status) . "</div>";
@@ -106,7 +106,7 @@ class FlightsDatatable
                             <img src="' . asset('icons/cancel.png') . '" alt="delete">
                         </button>';
 
-                        return '<div id="action-btn" class="flex gap-3">' . $editButton . $deleteButton . '</div>';
+                        return '<div id="action-btn" class="flex items-center justify-center">' . $editButton . $deleteButton . '</div>';
                     }
 
                     // Botón de compra para clientes autenticados
@@ -122,7 +122,7 @@ class FlightsDatatable
                         $buyButton = '<a href="' . route('tickets.purchase', ['flightId' => $flight->id]) . '" class="btn btn-sm btn-primary">
                         <img src="' . asset('icons/shop.png') . '" alt="buy">
                     </a>';
-                        return '<div id="action-btn" class="flex gap-3">' . $buyButton . '</div>';
+                        return '<div id="action-btn" class="flex items-center justify-center">' . $buyButton . '</div>';
                     }
 
                     return '';

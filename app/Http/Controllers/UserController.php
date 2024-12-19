@@ -69,7 +69,6 @@ class UserController extends Controller
     // Actualizar un usuario
     public function update(UserUpdateRequest $userRequest, $id)
     {
-
         // Busca el usuario con el ID proporcionado
         $user = User::findOrFail($id);
 
@@ -86,20 +85,19 @@ class UserController extends Controller
             $user->password = bcrypt($userRequest->password);
         }
 
-        // Asignar el rol al usuario
+        // Asignar el nuevo rol al usuario, eliminando el anterior
         $role = $userRequest->input('role');
         if ($role) {
-            $user->assignRole($role);
+            $user->syncRoles($role);  // Asigna el nuevo rol y elimina el anterior
         }
 
         // Guarda los cambios
         $user->save();
 
         return redirect()->route('users')
-        ->with('success_updated', 'User updated successfully')
-        ->with('last_updated_user_id', $user->id)
-        ->with('last_updated_user_name', $user->name);  // Guardamos el nombre también
-
+            ->with('success_updated', 'User updated successfully')
+            ->with('last_updated_user_id', $user->id)
+            ->with('last_updated_user_name', $user->name);  // Guardamos el nombre también
     }
 
     // Eliminar un usuario

@@ -118,4 +118,16 @@ table tbody tr:nth-child(even) {
 }
 
 
+#lastTicketsTable tbody tr {
+    height: 120px;
 
+}
+
+/* Colores alternados para las filas */
+#lastTicketsTable tbody tr:nth-child(odd) {
+    background-color: white; /* Color para filas impares */
+}
+
+#lastTicketsTable tbody tr:nth-child(even) {
+    background-color: white; /* Color para filas pares */
+}

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('capacity');
-            $table->enum('status', ['borrador', 'en espera', 'en trayecto', 'completo'])->default('borrador');
+            $table->enum('status', ['borrador', 'en espera', 'en trayecto', 'completo', 'finalizado'])->default('borrador');
             $table->timestamps();
         });
     }

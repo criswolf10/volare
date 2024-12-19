@@ -14,14 +14,13 @@
                     <div class="flex justify-center items-center w-full mb-1 xl:mb-4">
                         <x-input-label for="email" />
                         <x-text-input id="email" class=" mt-1 justify-center" type="email" name="email" value="{{ old('email') }}"
-                            required autofocus autocomplete="email" placeholder="Email" />
+                            autofocus autocomplete="email" placeholder="Email" />
                     </div>
                     <!-- Password -->
                     <x-input-error :messages="$errors->get('password')" class="mt-2 text-center" />
-
                     <div class="relative w-full mb-3">
                         <x-input-label for="password" />
-                        <x-text-input id="password" class="w-full" type="password" name="password" required
+                        <x-text-input id="password" class="w-full" type="password" name="password"
                             autocomplete="current-password" placeholder="Contraseña" />
                         <span class="absolute right-2.5 top-[25%] translate-y-[50%]  cursor-pointer"
                             onclick="togglePassword()">

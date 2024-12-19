@@ -39,7 +39,7 @@ Route::middleware(['auth'])->group(function () {
     // Mostrar formulario para crear un vuelo
     Route::get('/admin/create-flights', [FlightController::class, 'create'])->name('flights.create');
     // Guardar nuevo vuelo
-    Route::post('/admin/create-flights', [FlightController::class, 'store'])->name('flights.store');
+    Route::post('/admin/create', [FlightController::class, 'store'])->name('flights.store');
     // Mostrar formulario para editar un vuelo
     Route::get('/admin/edit-flights/{id}', [FlightController::class, 'edit'])->name('edit.flights');
     // Actualizar un vuelo
@@ -62,10 +62,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/myticket/data', [LastTicketsUserDatatable::class, 'getLastTicketsUser'])->name('tickets.LastTicketsUserDatatable');
     Route::get('/user-tickets', [UserTicketsDatatable::class, 'getUserTickets'])->name('datatables.userTickets');
     Route::get('/user-tickets/{userId}', [TicketController::class, 'showUserTickets'])->name('user-tickets');
-    Route::get('/purchase-ticket/{flightId}', [TicketController::class, 'create'])->name('tickets.purchase');
-    Route::patch('/purchase-ticket/{flightId}', [TicketController::class, 'store'])->name('tickets.processPurchase');
-    Route::delete('/cancel/tickets/{ticketId}', [TicketController::class, 'destroy'])->name('tickets.delete');
+    Route::delete('/cancel/tickets/{ticket}', [TicketController::class, 'destroy'])->name('tickets.delete');
     Route::get('/cancel/tickets/{ticketId}', [TicketController::class, 'cancelTicket'])->name('cancel-ticket');
+    Route::get('/purchase-ticket/{flightId}', [TicketController::class, 'create'])->name('tickets.purchase');
+    Route::post('/create-ticket/{flightId}', [TicketController::class, 'store'])->name('tickets.processPurchase');
     Route::get('/tickets/success/{ticketId}', [TicketController::class, 'purchaseSuccess'])->name('tickets.success');
 });
 

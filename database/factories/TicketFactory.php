@@ -43,9 +43,9 @@ class TicketFactory extends Factory
             'passenger_id' => $passenger->id, // Asociamos el ticket al pasajero
             'flight_id' => $flight->id,
             'aircraft_seat_id' => $seat->id,
-            'booking_code' => strtoupper(Str::random(10)),
+            'booking_code' => strtoupper(Str::random(6)),
             'quantity' => 1,
-            'purchase_date' => now(),
+            'purchase_date' => $this->faker->dateTimeBetween('-2 months', 'now'),
         ];
     }
 }

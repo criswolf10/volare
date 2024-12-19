@@ -4,10 +4,10 @@
 
     @section('content')
     <div class=" p-5 h-full w-full">
-        <div class="flex justify-start items-center w-full mb-6 p-3">
+        <div class="flex justify-start items-center w-full p-3">
 
-            <!-- Contenedor de los botones de filtro y añadir usuario -->
-            <div class="flex justify-start items-center w-[50%] gap-5">
+            <!-- Contenedor de los botones de filtro y -->
+            <div class="flex flex-row justify-between md:justify-start items-center w-full mb-5 p-3 gap-3">
 
                 <!-- Botón para abrir el modal de filtro -->
                 <button class="flex items-center justify-center bg-[#22B3B2] w-10 h-10 rounded cursor-pointer"
